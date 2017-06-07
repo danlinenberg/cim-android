@@ -6,5 +6,4 @@
     <string name="SHARED_PREF">cim_dtr</string>
     <string name="BUCKET">cim-application</string>
     <string name="TABLE_ID">eu-west-1:758e15f7-91d2-4bbf-928e-236b81799791</string>
-
 </resources>
