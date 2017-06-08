@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "928649429945",
+    "project_id": "cim-robolego"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:928649429945:android:024c1df8de23e459",
+        "android_client_info": {
+          "package_name": "com.tau.dtr.cim_application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "928649429945-2mj7v8tr06arhfaatai1ur9eou0s9r0e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tau.dtr.cim_application",
+            "certificate_hash": "700fbf578b0dcb84b9a7dbefbdcd8a68cfaa137f"
+          }
+        },
+        {
+          "client_id": "928649429945-sscab7asffi4lorob200fgfpl02l4l13.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLVkC0VbkdAkNh6ZeaBVo6qq7q0qK55Bo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,6 @@
 package com.tau.dtr.cim_application;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.support.v7.app.AppCompatActivity;
@@ -71,6 +72,15 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
             editor.commit();
             BluetoothManager.getInstance().StartQuery(brick, mInterface);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getResources().getString(R.string.LOGIN), null);
+        editor.commit();
+        Intent i = new Intent(getBaseContext(), LoginActivity.class);
+        startActivity(i);
     }
 
     public void showToast(final String txt)

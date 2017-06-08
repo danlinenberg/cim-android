@@ -68,4 +68,6 @@ public class BluetoothManager extends Activity{
             }
         }
     }
+
+
 }

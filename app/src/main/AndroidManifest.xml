@@ -17,6 +17,10 @@
         <activity android:name=".MainActivity"
                   android:windowSoftInputMode="stateHidden"
                   android:screenOrientation="landscape">
+        </activity>
+        <activity android:name=".LoginActivity"
+                  android:windowSoftInputMode="stateHidden"
+                  android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

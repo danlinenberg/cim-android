@@ -33,16 +33,6 @@
         android:layout_below="@+id/optimus_image"
         android:layout_centerHorizontal="true"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15dp"
-        android:text="Enter your brick name:"
-        android:id="@+id/enter_name_header"
-        android:layout_marginTop="54dp"
-        android:layout_below="@+id/textView3"
-        android:layout_centerHorizontal="true"/>
-
     <Button
         android:text="Find Connected Brick"
         android:layout_width="wrap_content"
@@ -64,6 +54,16 @@
         android:layout_alignLeft="@+id/bluetooth_button"
         android:layout_alignStart="@+id/bluetooth_button"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:text="Enter your brick name:"
+        android:id="@+id/enter_name_header"
+        android:layout_marginTop="74dp"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"/>
+
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -73,6 +73,7 @@
         android:textSize="20dp"
         android:gravity="center"
         android:id="@+id/enter_name_input"
+        android:layout_marginTop="18dp"
         android:layout_below="@+id/enter_name_header"
         android:layout_centerHorizontal="true"/>
 

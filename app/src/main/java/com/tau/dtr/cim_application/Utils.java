@@ -19,4 +19,5 @@ public class Utils extends Activity{
         Log.d(LOG_TAG, txt);
     }
 
+
 }
