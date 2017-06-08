@@ -45,6 +45,11 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
     public void onBluetoothComplete(String device_name){
         log("ready to begin match for device " + device_name);
         showToast("Ready to beging with brick " + device_name);
+
+        /**
+         * Start match
+         */
+        MultiplayerManager.getInstance().startQuickGame(this);
     }
 
     public void startAWS(){

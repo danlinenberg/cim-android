@@ -22,7 +22,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 public class LoginActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener {
     static SharedPreferences sharedPreferences;
-    GoogleApiClient mGoogleApiClient;
+    public static GoogleApiClient mGoogleApiClient;
     int RC_SIGN_IN = 1;
 
     @Override
@@ -30,11 +30,12 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         sharedPreferences = this.getSharedPreferences(getResources().getString(R.string.SHARED_PREF), 0);
-        if (sharedPreferences.getString(getResources().getString(R.string.LOGIN), null) != null) {
-            Intent i = new Intent(getBaseContext(), MainActivity.class);
-            startActivity(i);
-        }
 
+        if (sharedPreferences.getString(getResources().getString(R.string.LOGIN), null) != null) {
+//            Intent i = new Intent(getBaseContext(), MainActivity.class);
+//            startActivity(i);
+            login();
+        }
     }
 
     public void setUpLogin(){
@@ -50,6 +51,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
+                mGoogleApiClient.connect();
                 GoogleSignInAccount acct = result.getSignInAccount();
                 // Get account information
 //                String mFullName = acct.getDisplayName();
@@ -65,11 +67,13 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
     }
 
     public void onLogin(View v){
+        login();
+    }
+
+    public void login(){
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-
-// Build a GoogleApiClient with access to GoogleSignIn.API and the options above.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, (GoogleApiClient.OnConnectionFailedListener) this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
