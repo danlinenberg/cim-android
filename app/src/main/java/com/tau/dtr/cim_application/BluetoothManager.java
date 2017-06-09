@@ -7,7 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import java.util.Set;
 
-import static com.tau.dtr.cim_application.Utils.log;
+import static com.tau.dtr.cim_application.Utils.Utils.log;
+
 
 /**
  * Created by dan on 07/06/2017.
@@ -61,12 +62,14 @@ public class BluetoothManager extends Activity{
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress();
-                if (deviceName.equalsIgnoreCase(device_name)) {
+                if (deviceName.equalsIgnoreCase(device_name.replace(" ",""))) {
                     log("Device matched with name " + device_name);
                     mInterface.onBluetoothComplete(device_name);
+                    return;
                 }
             }
         }
+        mInterface.onBluetoothComplete(null);
     }
 
 

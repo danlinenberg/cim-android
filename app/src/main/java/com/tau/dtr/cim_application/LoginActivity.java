@@ -38,11 +38,6 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
         }
     }
 
-    public void setUpLogin(){
-        // Configure sign-in to request the user's ID, email address, and basic profile. ID and
-// basic profile are included in DEFAULT_SIGN_IN.
-    }
-
     @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -51,7 +46,6 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
-                mGoogleApiClient.connect();
                 GoogleSignInAccount acct = result.getSignInAccount();
                 // Get account information
 //                String mFullName = acct.getDisplayName();

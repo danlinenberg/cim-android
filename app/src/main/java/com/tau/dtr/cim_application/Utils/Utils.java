@@ -1,4 +1,4 @@
-package com.tau.dtr.cim_application;
+package com.tau.dtr.cim_application.Utils;
 
 import android.app.Activity;
 import android.app.Application;
@@ -19,5 +19,5 @@ public class Utils extends Activity{
         Log.d(LOG_TAG, txt);
     }
 
-
+    public static Boolean is_debug = false;
 }

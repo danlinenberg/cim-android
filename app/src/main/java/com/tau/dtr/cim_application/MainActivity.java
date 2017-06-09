@@ -15,8 +15,10 @@ import com.amazonaws.mobileconnectors.lambdainvoker.LambdaInvokerFactory;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.regions.Region;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.tau.dtr.cim_application.Utils.Utils;
 
-import static com.tau.dtr.cim_application.Utils.log;
+import static com.tau.dtr.cim_application.Utils.Utils.log;
 
 public class MainActivity extends AppCompatActivity implements MainInterface{
 
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
     static SharedPreferences sharedPreferences;
     private DynamoDBMapper mapper;
     public EditText editText;
+    public static GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +46,18 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
     }
 
     public void onBluetoothComplete(String device_name){
-        log("ready to begin match for device " + device_name);
-        showToast("Ready to beging with brick " + device_name);
+        if(device_name != null){
+            log("ready to begin match for device " + device_name);
+            showToast("Ready to begin with brick " + device_name);
 
-        /**
-         * Start match
-         */
-        MultiplayerManager.getInstance().startQuickGame(this);
+            /**
+             * Start match
+             */
+            Intent i = new Intent(getBaseContext(), MultiplayerManager.class);
+            startActivity(i);
+        }else{
+            showToast("Cannot find brick");
+        }
     }
 
     public void startAWS(){
@@ -70,6 +78,11 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
     }
 
     public void onButtonPressBluetooth(View v){
+        if(Utils.is_debug){
+            Intent i = new Intent(getBaseContext(), MultiplayerManager.class);
+            startActivity(i);
+            return;
+        }
         String brick = editText.getText().toString();
         if(!brick.equals("Your Brick Name") && !brick.equals("")){
             android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
