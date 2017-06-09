@@ -15,6 +15,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
 import com.google.android.gms.games.multiplayer.realtime.Room;
@@ -23,6 +24,8 @@ import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListene
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.tau.dtr.cim_application.Utils.Utils.log;
@@ -40,6 +43,27 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInFlow = true;
     private boolean mSignInClicked = false;
+
+    public static String mMyId;
+    public static Room mMyRoom;
+
+    @Override
+    public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
+        byte[] b = realTimeMessage.getMessageData();
+    }
+
+    public void SendMessage(String msg) {
+        try{
+            byte[] message = msg.getBytes("UTF-8");
+            ArrayList<Participant> participants = mMyRoom.getParticipants();
+            for (Participant p : participants) {
+                if (!p.getParticipantId().equals(mMyId)) {
+                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+                            mMyRoom.getRoomId(), p.getParticipantId());
+                }
+            }
+        }catch (UnsupportedEncodingException e){}
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +125,12 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
         // prevent screen from sleeping during handshake
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        /**
+         * Go to game screen
+         */
+        Intent intent = new Intent(this, Game.class);
+        startActivity(intent);
     }
 
     public void OnButtonLogin(View v){
@@ -140,20 +170,15 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         mGoogleApiClient.connect();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mGoogleApiClient.disconnect();
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        mGoogleApiClient.disconnect();
+//    }
 
     @Override
     public void onResult(@NonNull Result result) {
         log("Res: " + result);
-    }
-
-    @Override
-    public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
-
     }
 
     private RoomConfig.Builder makeBasicRoomConfigBuilder() {
@@ -228,22 +253,32 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
     @Override
     public void onRoomCreated(int i, Room room) {
-        log("Created room #"+i);
+        String roomId = room.getRoomId();
+        String id = room.getCreatorId();
+        log("Created room #"+ roomId);
+        mMyRoom = room;
+        mMyId = id;
     }
 
     @Override
     public void onLeftRoom(int i, String s) {
-        log("Left room #"+i);
     }
 
     @Override
     public void onJoinedRoom(int i, Room room) {
-        log("Joined room  #" +i);
+        String roomId = room.getRoomId();
+        ArrayList<Participant> participants = room.getParticipants();
+        log("Joined room #"+ roomId);
+        mMyRoom = room;
+        for (Participant p : participants) {
+            if (!p.getParticipantId().equals(room.getCreatorId())) {
+                mMyId = p.getParticipantId();
+            }
+        }
     }
 
     @Override
     public void onRoomConnected(int i, Room room) {
-        log("Connected room #" + i);
     }
 
 
@@ -255,6 +290,10 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
                 Toast.makeText(getApplicationContext(),txt, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static MultiplayerManager getInstance(){
+        return mContext;
     }
 
 }

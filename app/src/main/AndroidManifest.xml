@@ -29,6 +29,10 @@
                   android:windowSoftInputMode="stateHidden"
                   android:screenOrientation="landscape">
         </activity>
+        <activity android:name=".Game"
+                  android:windowSoftInputMode="stateHidden"
+                  android:screenOrientation="landscape">
+        </activity>
         <!--<activity android:name=".LoginActivity"-->
                   <!--android:windowSoftInputMode="stateHidden"-->
                   <!--android:screenOrientation="landscape">-->
