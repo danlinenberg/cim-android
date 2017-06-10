@@ -66,25 +66,9 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         try{
             byte[] message = msg.getBytes("UTF-8");
             Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mMyRoom.getRoomId());
-//            ArrayList<Participant> participants = mMyRoom.getParticipants();
-//            for (Participant p : participants) {
-//                if (!p.getParticipantId().equals(mMyId)) {
-//                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
-//                            mMyRoom.getRoomId(), p.getParticipantId());
-//                    log("Message sent: " + msg);
-//                }
-//            }
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
-
-    boolean shouldStartGame(Room room) {
-        int connectedPlayers = 0;
-        for (Participant p : room.getParticipants()) {
-            if (p.isConnectedToRoom()) ++connectedPlayers;
-        }
-        return connectedPlayers >= MIN_PLAYERS;
     }
 
     @Override
@@ -134,6 +118,14 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         log("Need to login");
     }
 
+    boolean shouldStartGame(Room room) {
+        int connectedPlayers = 0;
+        for (Participant p : room.getParticipants()) {
+            if (p.isConnectedToRoom()) ++connectedPlayers;
+        }
+        return connectedPlayers >= MIN_PLAYERS;
+    }
+
     public void StartGame(){
         Bundle am = RoomConfig.createAutoMatchCriteria(1, 1, 0);
 
@@ -151,8 +143,6 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         /**
          * Go to game screen
          */
-        Intent intent = new Intent(this, Game.class);
-        startActivity(intent);
     }
 
     public void OnButtonLogin(View v){
@@ -266,6 +256,12 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
                     public void onConnectedToRoom(Room room) {
                         showToast("Connected to room");
                         log("Connected to room");
+                        Boolean shouldStart = shouldStartGame(room);
+                        if(shouldStart){
+                            log("All connected, starting game");
+                            Intent intent = new Intent(mContext, Game.class);
+                            startActivity(intent);
+                        }
                     }
 
                     @Override
@@ -286,7 +282,6 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
                     @Override
                     public void onP2PConnected(String s) {
-                        showToast("P2P connected");
                         log("P2P Connected");
                     }
 
@@ -331,7 +326,6 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
     @Override
     public void onRoomConnected(int i, Room room) {
     }
-
 
     public void showToast(final String txt)
     {

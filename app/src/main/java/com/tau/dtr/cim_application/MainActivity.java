@@ -92,15 +92,6 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(getResources().getString(R.string.LOGIN), null);
-        editor.commit();
-        Intent i = new Intent(getBaseContext(), LoginActivity.class);
-        startActivity(i);
-    }
-
     public void showToast(final String txt)
     {
         runOnUiThread(new Runnable() {
