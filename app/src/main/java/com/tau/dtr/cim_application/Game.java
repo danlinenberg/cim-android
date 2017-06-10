@@ -27,12 +27,16 @@ public class Game extends Activity{
     }
 
     public void Start(){
-        log("Game started");
+
     }
 
-    public void onClick(View v){
-        MultiplayerManager.getInstance().SendMessage("test");
+    public void Decipher(String message){
+
     }
+
+//    public void onClick(View v){
+//        MultiplayerManager.getInstance().SendMessage("test");
+//    }
 
     @Override
     public void onBackPressed() {

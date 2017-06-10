@@ -57,6 +57,7 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
             byte[] b = realTimeMessage.getMessageData();
             String msg = new String(b, "UTF-8");
             log("Message received: " + msg);
+            Game.getInstance().Decipher(msg);
         }catch (Exception e){
             e.printStackTrace();
         }
