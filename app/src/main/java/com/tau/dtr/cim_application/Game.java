@@ -1,8 +1,11 @@
 package com.tau.dtr.cim_application;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.ImageView;
 
 import static com.tau.dtr.cim_application.MultiplayerManager.mMyId;
@@ -37,8 +40,10 @@ public class Game extends Activity{
         String playerStarterId = getIntent().getStringExtra(getResources().getString(R.string.game_player_starter));
         if(playerStarterId.equals(mMyId)){
             myTurn = true;
+            showTimedAlertDialog("Your turn!", "Click on spot you want to move your brick to", 5);
         }else{
             myTurn = false;
+            showTimedAlertDialog("Your opponent's move", "Wait for your opponent to make a move", 5);
         }
     }
 
@@ -58,5 +63,31 @@ public class Game extends Activity{
 
     public static Game getInstance(){
         return mContext;
+    }
+
+    public void showTimedAlertDialog(String header, String msg, Integer seconds){
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle(header).setMessage(msg);
+        final AlertDialog alert = dialog.create();
+        alert.show();
+
+// Hide after some seconds
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (alert.isShowing()) {
+                    alert.dismiss();
+                }
+            }
+        };
+
+        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+
+        handler.postDelayed(runnable, seconds*1000);
     }
 }
