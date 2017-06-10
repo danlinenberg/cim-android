@@ -45,13 +45,21 @@
         android:onClick="onButtonPressBluetooth"
         android:layout_centerHorizontal="true"/>
 
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@drawable/optimus"
+        android:id="@+id/optimus_image"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15dp"
         android:text="Enter your brick name:"
         android:id="@+id/enter_name_header"
-        android:layout_marginTop="74dp"
+        android:layout_marginTop="37dp"
         android:layout_below="@+id/textView3"
         android:layout_centerHorizontal="true"/>
 
@@ -64,16 +72,7 @@
         android:textSize="20dp"
         android:gravity="center"
         android:id="@+id/enter_name_input"
-        android:layout_marginTop="18dp"
         android:layout_below="@+id/enter_name_header"
-        android:layout_centerHorizontal="true"/>
-
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:srcCompat="@drawable/optimus"
-        android:id="@+id/optimus_image"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

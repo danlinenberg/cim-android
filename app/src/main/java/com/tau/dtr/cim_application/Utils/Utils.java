@@ -19,5 +19,5 @@ public class Utils extends Activity{
         Log.d(LOG_TAG, txt);
     }
 
-    public static Boolean is_debug = false;
+    public static Boolean is_debug = true;
 }

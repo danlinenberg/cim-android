@@ -1,5 +1,6 @@
 package com.tau.dtr.cim_application;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
@@ -39,6 +41,8 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
     public static MultiplayerManager mContext = new MultiplayerManager();
     public static GoogleApiClient mGoogleApiClient;
     private static int RC_SIGN_IN = 9001;
+    final static int RC_WAITING_ROOM = 10002;
+    final static int MIN_PLAYERS = 2;
 
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInFlow = true;
@@ -49,20 +53,38 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
-        byte[] b = realTimeMessage.getMessageData();
+        try{
+            byte[] b = realTimeMessage.getMessageData();
+            String msg = new String(b, "UTF-8");
+            log("Message received: " + msg);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void SendMessage(String msg) {
         try{
             byte[] message = msg.getBytes("UTF-8");
-            ArrayList<Participant> participants = mMyRoom.getParticipants();
-            for (Participant p : participants) {
-                if (!p.getParticipantId().equals(mMyId)) {
-                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
-                            mMyRoom.getRoomId(), p.getParticipantId());
-                }
-            }
-        }catch (UnsupportedEncodingException e){}
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mMyRoom.getRoomId());
+//            ArrayList<Participant> participants = mMyRoom.getParticipants();
+//            for (Participant p : participants) {
+//                if (!p.getParticipantId().equals(mMyId)) {
+//                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, message,
+//                            mMyRoom.getRoomId(), p.getParticipantId());
+//                    log("Message sent: " + msg);
+//                }
+//            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    boolean shouldStartGame(Room room) {
+        int connectedPlayers = 0;
+        for (Participant p : room.getParticipants()) {
+            if (p.isConnectedToRoom()) ++connectedPlayers;
+        }
+        return connectedPlayers >= MIN_PLAYERS;
     }
 
     @Override
@@ -162,6 +184,30 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
                         requestCode, resultCode, R.string.sign_in_failed);
             }
         }
+        /**
+         * Waiting room
+         */
+        if (requestCode == RC_WAITING_ROOM) {
+            if (resultCode == Activity.RESULT_OK) {
+                // (start game)
+                log("Ready to start game");
+            }
+            else if (resultCode == Activity.RESULT_CANCELED) {
+                // Waiting room was dismissed with the back button. The meaning of this
+                // action is up to the game. You may choose to leave the room and cancel the
+                // match, or do something else like minimize the waiting room and
+                // continue to connect in the background.
+
+                // in this example, we take the simple approach and just leave the room:
+                Games.RealTimeMultiplayer.leave(mGoogleApiClient, null, mMyRoom.getRoomId());
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+            else if (resultCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
+                // player wants to leave the room.
+                Games.RealTimeMultiplayer.leave(mGoogleApiClient, null, mMyRoom.getRoomId());
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        }
     }
 
     @Override
@@ -193,7 +239,7 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
                     @Override
                     public void onRoomAutoMatching(Room room) {
-                        log("Connecting to room");
+                        log("Automatching...");
                     }
 
                     @Override
@@ -230,7 +276,7 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
                     @Override
                     public void onPeersConnected(Room room, List<String> list) {
-
+                        log("Peer connected");
                     }
 
                     @Override
@@ -258,6 +304,9 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         log("Created room #"+ roomId);
         mMyRoom = room;
         mMyId = id;
+
+        Intent intent = Games.RealTimeMultiplayer.getWaitingRoomIntent(mGoogleApiClient, room, Integer.MAX_VALUE);
+        startActivityForResult(intent, RC_WAITING_ROOM);
     }
 
     @Override
@@ -275,6 +324,8 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
                 mMyId = p.getParticipantId();
             }
         }
+        Intent intent = Games.RealTimeMultiplayer.getWaitingRoomIntent(mGoogleApiClient, room, Integer.MAX_VALUE);
+        startActivityForResult(intent, RC_WAITING_ROOM);
     }
 
     @Override

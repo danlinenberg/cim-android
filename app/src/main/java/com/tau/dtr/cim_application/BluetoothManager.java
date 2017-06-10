@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
+
 import java.util.Set;
 
 import static com.tau.dtr.cim_application.Utils.Utils.log;
@@ -31,19 +33,23 @@ public class BluetoothManager extends Activity{
     }
 
     public void StartQuery(String deviceName, MainInterface mainInterface){
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mInterface = mainInterface;
-        if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth
-            log("device does not support bluetooth");
-            return;
-        }
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            enableBtIntent.putExtra(DEVICE_NAME_KEY , deviceName);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }else{
-            SeekDevices(deviceName);
+        try {
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            mInterface = mainInterface;
+            if (mBluetoothAdapter == null) {
+                // Device does not support Bluetooth
+                log("device does not support bluetooth");
+                return;
+            }
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                enableBtIntent.putExtra(DEVICE_NAME_KEY, deviceName);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else {
+                SeekDevices(deviceName);
+            }
+        }catch (Exception e){
+            showToast("Enable bluetooth");
         }
     }
     @Override
@@ -72,5 +78,14 @@ public class BluetoothManager extends Activity{
         mInterface.onBluetoothComplete(null);
     }
 
+    public void showToast(final String txt)
+    {
+        runOnUiThread(new Runnable() {
+            public void run()
+            {
+                Toast.makeText(getApplicationContext(),txt, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 }
