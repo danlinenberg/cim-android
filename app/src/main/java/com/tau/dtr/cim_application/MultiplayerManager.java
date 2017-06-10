@@ -341,7 +341,7 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
     }
 
     /**
-     * determines the player who has the first move by checking the bytes of their username. The player with the more bytes that are >50 gets to start
+     * determines the player who has the first move by checking the bytes of their username. The player with more bytes that are <50 gets to start
      * @param room
      * @return id of the player who has the first move
      */
@@ -352,7 +352,7 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
             try{
                 Integer count = 0;
                 for(byte b: p.getDisplayName().toString().getBytes("UTF-8")){
-                    if(b>50){
+                    if(b<50){
                         count=count+1;
                     }
                 }
