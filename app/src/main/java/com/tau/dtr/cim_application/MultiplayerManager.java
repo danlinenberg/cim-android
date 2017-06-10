@@ -28,7 +28,11 @@ import com.google.example.games.basegameutils.BaseGameUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import static com.tau.dtr.cim_application.Utils.Utils.log;
 
@@ -261,6 +265,9 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
                         if(shouldStart){
                             log("All connected, starting game");
                             Intent intent = new Intent(mContext, Game.class);
+                            //pick starter
+                            String firstId = getFirstPlayer(room);
+                            intent.putExtra(getResources().getString(R.string.game_player_starter), firstId);
                             startActivity(intent);
                         }
                     }
@@ -295,14 +302,19 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
     @Override
     public void onRoomCreated(int i, Room room) {
-        String roomId = room.getRoomId();
-        String id = room.getCreatorId();
-        log("Created room #"+ roomId);
-        mMyRoom = room;
-        mMyId = id;
 
-        Intent intent = Games.RealTimeMultiplayer.getWaitingRoomIntent(mGoogleApiClient, room, Integer.MAX_VALUE);
-        startActivityForResult(intent, RC_WAITING_ROOM);
+        try{
+            String roomId = room.getRoomId();
+            String id = room.getCreatorId();
+            log("Created room #"+ roomId);
+            mMyRoom = room;
+            mMyId = id;
+
+            Intent intent = Games.RealTimeMultiplayer.getWaitingRoomIntent(mGoogleApiClient, room, Integer.MAX_VALUE);
+            startActivityForResult(intent, RC_WAITING_ROOM);
+        }catch (Exception e){
+            showToast("Cannot join room. Check your internet connection");
+        }
     }
 
     @Override
@@ -326,6 +338,39 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
     @Override
     public void onRoomConnected(int i, Room room) {
+    }
+
+    /**
+     * determines the player who has the first move by checking the bytes of their username. The player with the more bytes that are >50 gets to start
+     * @param room
+     * @return id of the player who has the first move
+     */
+    public String getFirstPlayer(Room room){
+        ArrayList<Participant> participants = room.getParticipants();
+        HashMap<String, Integer> counts = new HashMap<String, Integer>();
+        for(Participant p : participants){
+            try{
+                Integer count = 0;
+                for(byte b: p.getDisplayName().toString().getBytes("UTF-8")){
+                    if(b>50){
+                        count=count+1;
+                    }
+                }
+                counts.put(p.getParticipantId(), count);
+            }catch (UnsupportedEncodingException e){}
+        }
+        String firstId = "";
+        Integer firstCount = 0;
+        Iterator it = counts.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            if((Integer) pair.getValue() > firstCount){
+                firstCount = (Integer) pair.getValue();
+                firstId = pair.getKey().toString();
+            }
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+        return firstId;
     }
 
     public void showToast(final String txt)

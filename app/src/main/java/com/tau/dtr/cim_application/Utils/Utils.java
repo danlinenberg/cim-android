@@ -20,4 +20,5 @@ public class Utils extends Activity{
     }
 
     public static Boolean is_debug = true;
+
 }
