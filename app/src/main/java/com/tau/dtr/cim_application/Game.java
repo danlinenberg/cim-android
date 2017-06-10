@@ -3,12 +3,7 @@ package com.tau.dtr.cim_application;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.multiplayer.Participant;
-
-import static com.tau.dtr.cim_application.MultiplayerManager.mGoogleApiClient;
+import android.widget.ImageView;
 import static com.tau.dtr.cim_application.Utils.Utils.log;
 
 /**
@@ -23,10 +18,17 @@ public class Game extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
-        log("Game started");
+
+        PlacePieces();
     }
 
-    public void Start(){
+    public void PlacePieces(){
+        log("Game started");
+        ImageView player2 = (ImageView) findViewById(R.id.square_14);
+        ImageView player1 = (ImageView) findViewById(R.id.square_74);
+
+        player1.setImageDrawable(getResources().getDrawable(R.drawable.circle_blue));
+        player2.setImageDrawable(getResources().getDrawable(R.drawable.circle_red));
 
     }
 
