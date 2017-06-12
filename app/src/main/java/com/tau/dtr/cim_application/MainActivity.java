@@ -3,8 +3,10 @@ package com.tau.dtr.cim_application;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,10 +20,13 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.tau.dtr.cim_application.Utils.Utils;
 
+import java.io.IOException;
+
 import static com.tau.dtr.cim_application.Utils.Utils.log;
 
 public class MainActivity extends AppCompatActivity implements MainInterface{
 
+    public static MainActivity mContext = new MainActivity();
     public MainInterface mInterface;
     public static CognitoCachingCredentialsProvider credentialsProvider;
 //    public static LambdaInterface lambdaInterface;
@@ -36,14 +41,16 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mInterface = this;
+        mContext = this;
         sharedPreferences = this.getSharedPreferences(getResources().getString(R.string.SHARED_PREF), 0);
         editText= (EditText) findViewById(R.id.enter_name_input);
         if (sharedPreferences.getString("brick", null) != null) {
             editText.setText(sharedPreferences.getString("brick", null));
         }
 
-        startAWS();
+//        startAWS();
     }
+
 
     public void onBluetoothComplete(String device_name){
         if(device_name != null){
@@ -56,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
             Intent i = new Intent(getBaseContext(), MultiplayerManager.class);
             startActivity(i);
         }else{
-            showToast("Cannot find brick");
+            showToast("Cannot connect to brick");
         }
     }
 
@@ -88,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
             android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("brick", brick);
             editor.commit();
-            BluetoothManager.getInstance().StartQuery(brick, mInterface);
+            BluetoothController.getInstance().StartBluetoothQuery(brick, this);
         }
     }
 
@@ -101,4 +108,9 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
             }
         });
     }
+
+    public static MainActivity getInstance(){
+        return mContext;
+    }
+
 }

@@ -97,8 +97,41 @@ public class Game extends Activity{
         }
     }
 
+    public void HandleLejos(Integer old_position, Integer new_position){
+        int compare = new_position-old_position;
+        String direction = "f";
+        switch (compare){
+            case(1):
+                direction = "r";
+                break;
+            case(-2):
+                direction = "l";
+                break;
+            case(10):
+                direction = "f";
+                break;
+            case(11):
+                direction = "fr";
+                break;
+            case(9):
+                direction = "fl";
+                break;
+            case(-10):
+                direction = "b";
+                break;
+            case(-9):
+                direction = "bl";
+                break;
+            case(-11):
+                direction = "br";
+                break;
+        }
+        BluetoothController.getInstance().SendMessage(direction);
+    }
+
     public void MoveTileSelf(Integer position){
         MultiplayerManager.getInstance().SendMessage(position.toString());
+        HandleLejos(myTile, position);
 
         int resID = getApplicationContext().getResources().getIdentifier("square_"+position.toString(), "id", getPackageName());
         int resID_old = getApplicationContext().getResources().getIdentifier("square_"+myTile.toString(), "id", getPackageName());

@@ -19,7 +19,8 @@ public class Utils extends Activity{
         Log.d(LOG_TAG, txt);
     }
 
-    public static Boolean is_debug = true;
+
+    public static Boolean is_debug = false;
 
 //    public static int firstDigit(int n) {
 //        while (n < -9 || 9 < n) n /= 10;
