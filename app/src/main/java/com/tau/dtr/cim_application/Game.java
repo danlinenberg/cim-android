@@ -99,31 +99,31 @@ public class Game extends Activity{
 
     public void HandleLejos(Integer old_position, Integer new_position){
         int compare = new_position-old_position;
-        String direction = "f";
+        String direction = "f"; //default go forward
         switch (compare){
             case(1):
-                direction = "r";
+                direction = "r"; //114
                 break;
-            case(-2):
-                direction = "l";
-                break;
-            case(10):
-                direction = "f";
-                break;
-            case(11):
-                direction = "fr";
-                break;
-            case(9):
-                direction = "fl";
+            case(-1):
+                direction = "l"; //108
                 break;
             case(-10):
-                direction = "b";
+                direction = "f"; //102
+                break;
+            case(10):
+                direction = "b"; //98
+                break;
+            case(11):
+                direction = "fr"; //102 114
+                break;
+            case(9):
+                direction = "bl"; //98 108
                 break;
             case(-9):
-                direction = "bl";
+                direction = "fl"; //102 108
                 break;
             case(-11):
-                direction = "br";
+                direction = "fr"; //102 114
                 break;
         }
         BluetoothController.getInstance().SendMessage(direction);
