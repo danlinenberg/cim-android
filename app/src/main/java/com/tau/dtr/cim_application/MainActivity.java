@@ -95,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
             android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("brick", brick);
             editor.commit();
+            Intent i = new Intent(getBaseContext(), BluetoothController.class);
+            startActivity(i);
             BluetoothController.getInstance().StartBluetoothQuery(brick, this);
         }
     }

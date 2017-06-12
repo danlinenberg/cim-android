@@ -2,6 +2,7 @@ package com.tau.dtr.cim_application;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,18 @@ import static com.tau.dtr.cim_application.Utils.Utils.log;
 public class BluetoothController extends Activity {
 
     public static BluetoothController mContext = new BluetoothController();
-    static String devie_name;
+    static String device_name;
     static MainInterface mainInterface;
 
     static Bluetooth bluetooth;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(bluetooth==null){
+            instantiateBluetooth();
+        }
+    }
 
     public void instantiateBluetooth(){
         bluetooth = new Bluetooth(this);
@@ -35,7 +44,7 @@ public class BluetoothController extends Activity {
             @Override
             public void onDevice(BluetoothDevice device) {
                 // device found
-                if(device.getName().equals(devie_name)){
+                if(device.getName().equals(device_name)){
                     bluetooth.pair(device);
                 }
             }
@@ -94,10 +103,8 @@ public class BluetoothController extends Activity {
 
 
     public void StartBluetoothQuery(String name, MainInterface inter){
-        if(bluetooth==null){
-            instantiateBluetooth();
-        }
-        devie_name = name.replace(" ","");
+
+        device_name = name.replace(" ","");
         mainInterface = inter;
 
         boolean found = false;
@@ -106,7 +113,7 @@ public class BluetoothController extends Activity {
         ArrayList<String> names = new ArrayList<>();
         for(BluetoothDevice d: deviceList){
             names.add(d.getName());
-            if(d.getName().equalsIgnoreCase(devie_name)){
+            if(d.getName().equalsIgnoreCase(device_name)){
                 found = true;
                 bluetooth.connectToDevice(d);
                 break;

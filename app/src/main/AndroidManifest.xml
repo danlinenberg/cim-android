@@ -35,6 +35,7 @@
                   android:screenOrientation="landscape">
         </activity>
         <activity android:name=".BluetoothController"
+                  android:theme="@android:style/Theme.NoDisplay"
                   android:windowSoftInputMode="stateHidden"
                   android:screenOrientation="landscape">
             </activity>
