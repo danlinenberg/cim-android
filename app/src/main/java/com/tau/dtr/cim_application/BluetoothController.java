@@ -3,6 +3,7 @@ package com.tau.dtr.cim_application;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import static com.tau.dtr.cim_application.Utils.Utils.log;
  * Created by dan on 12/06/2017.
  */
 
-public class BluetoothController extends Activity {
+public class BluetoothController {
 
     public static BluetoothController mContext = new BluetoothController();
     static String device_name;
@@ -22,16 +23,8 @@ public class BluetoothController extends Activity {
 
     static Bluetooth bluetooth;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if(bluetooth==null){
-            instantiateBluetooth();
-        }
-    }
-
-    public void instantiateBluetooth(){
-        bluetooth = new Bluetooth(this);
+    public void instantiateBluetooth(Activity act){
+        bluetooth = new Bluetooth(act);
         bluetooth.enableBluetooth();
 
         bluetooth.setDiscoveryCallback(new Bluetooth.DiscoveryCallback() {
@@ -128,7 +121,9 @@ public class BluetoothController extends Activity {
     public void SendMessage(String msg){
         try {
             bluetooth.send(msg);
-        }catch (Exception e){};
+        }catch (Exception e){
+            e.printStackTrace();
+        };
     }
 
     public static BluetoothController getInstance(){

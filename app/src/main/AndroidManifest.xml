@@ -34,11 +34,16 @@
                   android:windowSoftInputMode="stateHidden"
                   android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".BluetoothController"
-                  android:theme="@android:style/Theme.NoDisplay"
+
+        <activity android:name=".Debug.Debug_Tester"
                   android:windowSoftInputMode="stateHidden"
-                  android:screenOrientation="landscape">
-            </activity>
+                  android:screenOrientation="userLandscape">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN"/>-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
+        </activity>
 
 
         <meta-data android:name="com.google.android.gms.games.APP_ID"
