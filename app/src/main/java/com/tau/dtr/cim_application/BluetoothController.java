@@ -99,6 +99,7 @@ public class BluetoothController extends Activity {
                 mainInterface.onBluetoothComplete(null);
             }
         });
+
     }
 
 
@@ -125,7 +126,9 @@ public class BluetoothController extends Activity {
     }
 
     public void SendMessage(String msg){
-        bluetooth.send(msg);
+        try {
+            bluetooth.send(msg);
+        }catch (Exception e){};
     }
 
     public static BluetoothController getInstance(){
