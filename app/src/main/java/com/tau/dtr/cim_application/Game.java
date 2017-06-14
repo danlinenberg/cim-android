@@ -53,8 +53,15 @@ public class Game extends Activity{
         player1.setImageDrawable(getResources().getDrawable(R.drawable.circle_blue));
         player2.setImageDrawable(getResources().getDrawable(R.drawable.circle_red));
 
-        String playerStarterId = getIntent().getStringExtra(getResources().getString(R.string.game_player_starter));
-        if(playerStarterId.equals(mMyId)){
+//        String playerStarterId = getIntent().getStringExtra(getResources().getString(R.string.game_player_starter));
+//        if(playerStarterId.equals(mMyId)){
+//            myTurn = true;
+//            showTimedAlertDialog("Your turn!", "Click on spot you want to move your brick to", 5);
+//        }else{
+//            myTurn = false;
+//            showTimedAlertDialog("Your opponent's move", "Wait for your opponent to make a move", 5);
+//        }
+        if(BluetoothController.device_name.equalsIgnoreCase("Arafat1")){
             myTurn = true;
             showTimedAlertDialog("Your turn!", "Click on spot you want to move your brick to", 5);
         }else{
@@ -99,34 +106,43 @@ public class Game extends Activity{
 
     public void HandleLejos(Integer old_position, Integer new_position){
         int compare = new_position-old_position;
-        String direction = "f"; //default go forward
+//        String direction = "f"; //default go forward
         switch (compare){
             case(1):
-                direction = "r"; //114
+                //Right
+                Lejos.Right();
+//                direction = "r"; //114
                 break;
             case(-1):
-                direction = "l"; //108
+                Lejos.Left();
+//                direction = "l"; //108
                 break;
             case(-10):
-                direction = "f"; //102
+                Lejos.Forward();
+//                direction = "f"; //102
                 break;
             case(10):
-                direction = "b"; //98
+                Lejos.Back();
+//                direction = "b"; //98
                 break;
             case(11):
-                direction = "fr"; //102 114
+                Lejos.ForwardRight();
+//                direction = "fr"; //102 114
                 break;
             case(9):
-                direction = "bl"; //98 108
+                Lejos.BackLeft();
+//                direction = "bl"; //98 108
                 break;
             case(-9):
-                direction = "fl"; //102 108
+                Lejos.ForwardLeft();
+//                direction = "fl"; //102 108
                 break;
             case(-11):
-                direction = "fr"; //102 114
+                Lejos.BackRight();
+//                direction = "br"; //102
+
                 break;
         }
-        BluetoothController.getInstance().SendMessage(direction);
     }
 
     public void MoveTileSelf(Integer position){

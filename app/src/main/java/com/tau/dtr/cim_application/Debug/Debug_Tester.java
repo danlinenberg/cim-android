@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.tau.dtr.cim_application.BluetoothController;
+import com.tau.dtr.cim_application.Lejos;
 import com.tau.dtr.cim_application.MainInterface;
 import com.tau.dtr.cim_application.R;
 
@@ -36,27 +37,19 @@ public class Debug_Tester extends Activity implements MainInterface{
     }
 
     public void onForward(View v){
-        long time_input = Long.parseLong(editText1.getText().toString());
-        BluetoothController.getInstance().SendMessage("f");
-        onWait(time_input);
+        Lejos.Forward();
     }
 
     public void onBack(View v){
-        long time_input = Long.parseLong(editText1.getText().toString());
-        BluetoothController.getInstance().SendMessage("b");
-        onWait(time_input);
+        Lejos.Back();
     }
 
     public void onRight(View v){
-        long time_input = Long.parseLong(editText2.getText().toString());
-        BluetoothController.getInstance().SendMessage("r");
-        onWait(time_input);
+        Lejos.Right();
     }
 
     public void onLeft(View v){
-        long time_input = Long.parseLong(editText2.getText().toString());
-        BluetoothController.getInstance().SendMessage("l");
-        onWait(time_input);
+        Lejos.Left();
     }
 
     public void onConnect(View v){

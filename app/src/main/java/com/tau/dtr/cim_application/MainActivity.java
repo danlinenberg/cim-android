@@ -11,18 +11,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-//import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-//import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
-//import com.amazonaws.mobileconnectors.lambdainvoker.LambdaInvokerFactory;
-//import com.amazonaws.regions.Regions;
-//import com.amazonaws.regions.Region;
-//import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.mobileconnectors.lambdainvoker.LambdaInvokerFactory;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.regions.Region;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.tau.dtr.cim_application.Utils.Utils;
-
-import java.io.IOException;
-
-import me.aflak.bluetooth.Bluetooth;
 
 import static com.tau.dtr.cim_application.Utils.Utils.log;
 
@@ -30,10 +26,10 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
 
     public static MainActivity mContext = new MainActivity();
     public static MainInterface mInterface;
-//    public static CognitoCachingCredentialsProvider credentialsProvider;
-////    public static LambdaInterface lambdaInterface;
-//    public static LambdaInvokerFactory factory;
-//    private DynamoDBMapper mapper;
+    public static CognitoCachingCredentialsProvider credentialsProvider;
+//    public static LambdaInterface lambdaInterface;
+    public static LambdaInvokerFactory factory;
+    private DynamoDBMapper mapper;
     public EditText editText;
     static SharedPreferences sharedPreferences;
 
@@ -69,22 +65,22 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
         }
     }
 
-//    public void startAWS(){
-//        // Initialize the Amazon Cognito credentials provider
-//        credentialsProvider = new CognitoCachingCredentialsProvider(
-//                getApplicationContext(),
-//                getResources().getString(R.string.TABLE_ID), // Federated Identity Pool ID
-//                Regions.EU_WEST_1 // Region
-//        );
-//        factory = new LambdaInvokerFactory(
-//                getApplicationContext(),
-//                Regions.EU_WEST_1,
-//                credentialsProvider);
-////        lambdaInterface = factory.build(LambdaInterface.class);
-//        AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
-//        ddbClient.setRegion(Region.getRegion(Regions.EU_WEST_1));
-//        mapper = new DynamoDBMapper(ddbClient);
-//    }
+    public void startAWS(){
+        // Initialize the Amazon Cognito credentials provider
+        credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                getResources().getString(R.string.TABLE_ID), // Federated Identity Pool ID
+                Regions.EU_WEST_1 // Region
+        );
+        factory = new LambdaInvokerFactory(
+                getApplicationContext(),
+                Regions.EU_WEST_1,
+                credentialsProvider);
+//        lambdaInterface = factory.build(LambdaInterface.class);
+        AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(credentialsProvider);
+        ddbClient.setRegion(Region.getRegion(Regions.EU_WEST_1));
+        mapper = new DynamoDBMapper(ddbClient);
+    }
 
     public void onButtonPressBluetooth(View v){
         if(Utils.is_debug){

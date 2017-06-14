@@ -18,7 +18,7 @@ import static com.tau.dtr.cim_application.Utils.Utils.log;
 public class BluetoothController {
 
     public static BluetoothController mContext = new BluetoothController();
-    static String device_name;
+    public static String device_name;
     static MainInterface mainInterface;
 
     static Bluetooth bluetooth;

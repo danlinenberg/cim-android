@@ -6,58 +6,6 @@
                 android:background="@drawable/gradient"
                 android:layout_height="match_parent">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="104dp"
-        android:id="@+id/millis"/>
-
-    <Button
-        android:text="Forward"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/forward"
-        android:layout_below="@+id/millis"
-        android:onClick="onForward"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="108dp"/>
-
-    <Button
-        android:text="Left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/left"
-        android:onClick="onLeft"
-        android:layout_marginTop="71dp"
-        android:layout_below="@+id/forward"
-        android:layout_toStartOf="@+id/millis"
-        android:layout_marginEnd="41dp"/>
-
-    <Button
-        android:text="Back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/back"
-        android:onClick="onBack"
-        android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/forward"
-        android:layout_marginBottom="15dp"/>
-
-    <Button
-        android:text="Right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/right"
-        android:onClick="onRight"
-        android:layout_marginStart="59dp"
-        android:layout_alignBottom="@+id/left"
-        android:layout_toEndOf="@+id/millis"
-        android:layout_marginBottom="12dp"/>
-
     <Button
         android:text="connect"
         android:layout_width="wrap_content"
@@ -78,4 +26,53 @@
         android:layout_below="@+id/millis"
         android:layout_alignStart="@+id/millis"
         android:layout_marginTop="15dp"/>
+
+    <Button
+        android:text="Left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/left"
+        android:onClick="onLeft"
+        android:layout_marginStart="14dp"
+        android:layout_above="@+id/back"
+        android:layout_alignStart="@+id/onConnect"/>
+
+    <Button
+        android:text="Right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/right"
+        android:onClick="onRight"
+        android:layout_marginStart="36dp"
+        android:layout_above="@+id/back"
+        android:layout_toEndOf="@+id/millis2"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:layout_marginTop="74dp"
+        android:id="@+id/millis"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:text="Back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/back"
+        android:onClick="onBack"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/forward"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:text="Forward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/forward"
+        android:onClick="onForward"
+        android:layout_above="@+id/back"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
