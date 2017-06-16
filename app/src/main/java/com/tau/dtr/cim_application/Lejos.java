@@ -206,6 +206,10 @@ public class Lejos {
         }, TIME_STRAIGHT);
     }
 
+    public static void makeSound_Boom(){
+
+    }
+
 
 
 }

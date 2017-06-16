@@ -20,7 +20,7 @@ public class Utils extends Activity{
     }
 
 
-    public static Boolean is_debug = false;
+    public static Boolean is_debug = true;
 
 //    public static int firstDigit(int n) {
 //        while (n < -9 || 9 < n) n /= 10;

@@ -83,19 +83,15 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
     }
 
     public void onButtonPressBluetooth(View v){
+        String brick = editText.getText().toString();
+        saveBrickName(brick);
+
         if(Utils.is_debug){
             Intent i = new Intent(getBaseContext(), MultiplayerManager.class);
             startActivity(i);
             return;
         }
-        String brick = editText.getText().toString();
-        if(!brick.equals("Your Brick Name") && !brick.equals("")){
-            android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("brick", brick);
-            editor.commit();
-
-            BluetoothController.getInstance().StartBluetoothQuery(brick, this);
-        }
+        BluetoothController.getInstance().StartBluetoothQuery(brick, this);
     }
 
     public void showToast(final String txt)
@@ -106,6 +102,12 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
                 Toast.makeText(getApplicationContext(),txt, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void saveBrickName(String brick) {
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("brick", brick);
+        editor.commit();
     }
 
     public static MainActivity getInstance(){
