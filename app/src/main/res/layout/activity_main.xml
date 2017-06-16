@@ -75,4 +75,14 @@
         android:layout_below="@+id/enter_name_header"
         android:layout_centerHorizontal="true"/>
 
+    <Button
+        android:text="DEBUG"
+        android:onClick="setDebug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/names_header"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="30dp"
+        android:id="@+id/debug"/>
+
 </RelativeLayout>

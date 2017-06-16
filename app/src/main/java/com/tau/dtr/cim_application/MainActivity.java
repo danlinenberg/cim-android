@@ -20,6 +20,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.tau.dtr.cim_application.Utils.Utils;
 
+import static com.tau.dtr.cim_application.Utils.Utils.is_debug;
 import static com.tau.dtr.cim_application.Utils.Utils.log;
 
 public class MainActivity extends AppCompatActivity implements MainInterface{
@@ -92,6 +93,16 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
             return;
         }
         BluetoothController.getInstance().StartBluetoothQuery(brick, this);
+    }
+
+    public void setDebug(View v){
+        if(is_debug){
+            is_debug = false;
+            showToast("Debug mode off");
+        }else{
+            is_debug = true;
+            showToast("Debug mode on");
+        }
     }
 
     public void showToast(final String txt)
