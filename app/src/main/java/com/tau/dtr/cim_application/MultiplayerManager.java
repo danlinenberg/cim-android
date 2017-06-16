@@ -55,6 +55,9 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
     public static String mMyId;
     public static Room mMyRoom;
 
+    static Long timeSent;
+    static final int TIME_BETWEEN_MESSAGES = 1000;
+
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
         try{
@@ -68,6 +71,7 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
     }
 
     public void SendMessage(String msg) {
+        timeSent = System.currentTimeMillis();
         try{
             byte[] message = msg.getBytes("UTF-8");
             Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, message, mMyRoom.getRoomId());
@@ -371,6 +375,15 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
             it.remove(); // avoids a ConcurrentModificationException
         }
         return firstId;
+    }
+
+    public boolean enoughTimeBetweenCommands(){
+        if(timeSent!=null){
+            if(System.currentTimeMillis()<=timeSent+TIME_BETWEEN_MESSAGES) {
+                return false;
+            }
+        }
+        return  true;
     }
 
     public void showToast(final String txt)

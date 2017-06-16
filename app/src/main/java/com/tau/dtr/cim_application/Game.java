@@ -125,6 +125,10 @@ public class Game extends Activity{
 
     public void getTilePressed(View v){
         if(myTurn){
+            if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
+                showToast("Please wait a second before issueing another command");
+                return;
+            }
             int id = v.getId();
             String resource = v.getResources().getResourceEntryName(id);
             String resource_str = resource.replace("square_", "");
@@ -356,5 +360,6 @@ public class Game extends Activity{
             }
         });
     }
+
 
 }
