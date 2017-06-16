@@ -34,6 +34,7 @@ public class Game extends Activity{
 
     public static Game mContext = new Game();
     static Boolean myTurn;
+    static Boolean ShotsCaller;
     static Integer myTile;
     static Integer opponentTile;
     static Context mCtx;
@@ -80,13 +81,16 @@ public class Game extends Activity{
         try{
             if(sharedPreferences.getString("brick", null).contains("Arafat")){
                 myTurn = true;
+                ShotsCaller = true;
                 showTimedAlertDialog("Your turn!", "Click on spot you want to move your brick to", 5);
             }else{
                 myTurn = false;
+                ShotsCaller = false;
                 showTimedAlertDialog("Your opponent's move", "Wait for your opponent to make a move", 5);
             }
         }catch (NullPointerException e){
             myTurn = false;
+            ShotsCaller = false;
         }
     }
 
@@ -115,6 +119,10 @@ public class Game extends Activity{
 
         }catch (NumberFormatException e){
             // bomb
+            if(message.equals("win")){
+                onWin();
+                return;
+            }
             String[] sep = message.split(" ");
             if(sep[0].equals("bomb")){
                 String tile = sep[1];
@@ -172,16 +180,10 @@ public class Game extends Activity{
             hp = hp-1;
             bombs_location.remove(tile);
             if(hp==0){
-                showTimedAlertDialog("LOST!", "You're not very good at this are you?", 6);
-                leaveGame();
+                onLose();
             }
             showTimedAlertDialog("PWNED!", "You just stepped on a mine", 3);
         }
-    }
-
-    public void leaveGame(){
-        Intent i = new Intent(getBaseContext(), MainActivity.class);
-        startActivity(i);
     }
 
     public void MoveTileSelf(Integer position){
@@ -350,6 +352,62 @@ public class Game extends Activity{
         }
     }
 
+
+    public void onLose(){
+
+        MultiplayerManager.getInstance().SendMessage("win");
+
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("YOU LOSE").setMessage("You're not very good at this, are you?");
+        final AlertDialog alert = dialog.create();
+        alert.show();
+
+// Hide after some seconds
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (alert.isShowing()) {
+                    alert.dismiss();
+                }
+            }
+        };
+        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+                Intent i = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(i);
+            }
+        });
+        handler.postDelayed(runnable, 10*1000);
+    }
+
+    public void onWin(){
+
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("YOU WIN!!!").setMessage("You're the best, around! nothing's ever gonna keep you down");
+        final AlertDialog alert = dialog.create();
+        alert.show();
+
+// Hide after some seconds
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (alert.isShowing()) {
+                    alert.dismiss();
+                }
+            }
+        };
+        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+                Intent i = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(i);
+            }
+        });
+        handler.postDelayed(runnable, 10*1000);
+    }
 
     public void showToast(final String txt)
     {
