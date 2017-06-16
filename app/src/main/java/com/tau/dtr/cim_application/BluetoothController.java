@@ -37,9 +37,14 @@ public class BluetoothController {
             @Override
             public void onDevice(BluetoothDevice device) {
                 // device found
-                if(device.getName().equals(device_name)){
-                    bluetooth.pair(device);
+                try {
+                    if (device.getName().equals(device_name)) {
+                        bluetooth.pair(device);
+                    }
+                }catch (Exception e){
+                    mainInterface.onBluetoothComplete(null);
                 }
+
             }
 
             @Override
