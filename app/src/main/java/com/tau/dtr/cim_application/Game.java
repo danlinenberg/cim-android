@@ -263,7 +263,7 @@ public class Game extends Activity{
         Integer position_inverted = revertTile(position);
         String position_inverted_str = String.valueOf(position_inverted);
 
-        ImageView player2 = findImageButton(position_inverted_str);
+        ImageView player2 = findImageButton("square_"+position_inverted_str);
         ImageView player2_old = findImageButton("square_"+opponentTile.toString());
         player2.setImageDrawable(getResources().getDrawable(R.drawable.tank_red));
         player2_old.setImageDrawable(getResources().getDrawable(android.R.color.transparent));
