@@ -25,6 +25,7 @@ import static com.tau.dtr.cim_application.MultiplayerManager.mGoogleApiClient;
 import static com.tau.dtr.cim_application.MultiplayerManager.mMyId;
 import static com.tau.dtr.cim_application.MultiplayerManager.mMyRoom;
 import static com.tau.dtr.cim_application.Utils.Utils.getNthDigit;
+import static com.tau.dtr.cim_application.Utils.Utils.is_debug;
 import static com.tau.dtr.cim_application.Utils.Utils.log;
 import static com.tau.dtr.cim_application.Utils.Utils.returnRandom;
 import static com.tau.dtr.cim_application.Utils.Utils.revertTile;
@@ -53,6 +54,7 @@ public class Game extends Activity{
     static boolean bombIntent;
     static boolean invulnerable;
     static boolean confused;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +150,7 @@ public class Game extends Activity{
     }
 
     public void getTilePressed(View v){
-        if(myTurn){
+        if(myTurn || is_debug){
             if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
                 showToast("Please wait a second before issueing another command");
                 return;
@@ -175,7 +177,7 @@ public class Game extends Activity{
         }
     }
 
-    public void checkBombs(Integer tile){
+    public void checkBombs(final Integer tile){
         if(bombs_location.contains(tile)){
             if(invulnerable){
                 invulnerable = false;
@@ -197,7 +199,13 @@ public class Game extends Activity{
             }
             hp = hp-1;
             bombs_location.remove(tile);
-            MultiplayerManager.getInstance().SendMessage("bomb_remove " + revertTile(tile).toString());
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    MultiplayerManager.getInstance().SendMessage("bomb_remove " + revertTile(tile).toString());
+                }
+            }, 1000);
             if(hp==0){
                 onLose();
             }
@@ -205,7 +213,7 @@ public class Game extends Activity{
         }
     }
 
-    public void checkPowerups(Integer tile){
+    public void checkPowerups(final Integer tile){
         if(powerup_location.contains(tile)){
             Lejos.makeSound_Powerup();
             Integer randomPowerup = returnRandom(0,4);
@@ -237,7 +245,13 @@ public class Game extends Activity{
             }
             hp = hp-1;
             bombs_location.remove(tile);
-            MultiplayerManager.getInstance().SendMessage("powerup_remove " + tile.toString());
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    MultiplayerManager.getInstance().SendMessage("powerup_remove " + tile.toString());
+                }
+            }, 1000);
             if(hp==0){
                 onLose();
             }
@@ -247,7 +261,10 @@ public class Game extends Activity{
 
     public void MoveTileSelf(Integer position){
         MultiplayerManager.getInstance().SendMessage(position.toString());
-        HandleLejos(myTile, position);
+
+        if(!is_debug){
+            HandleLejos(myTile, position);
+        }
 
         ImageView player1 = findImageButton("square_"+position.toString());
         ImageView player1_old = findImageButton("square_"+myTile.toString());
