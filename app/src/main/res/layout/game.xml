@@ -421,18 +421,11 @@
             android:layout_height="90dp"
             android:src="@drawable/hp_33"/>
 
-        <!--<ImageButton-->
-            <!--android:id="@+id/immortal_container"-->
-            <!--android:layout_width="150dp"-->
-            <!--android:layout_height="90dp"-->
-            <!--android:scaleType="fitCenter"-->
-            <!--android:background="@null"/>-->
-
         <ImageButton
             android:id="@+id/bomb_container"
             android:layout_width="150dp"
-            android:layout_marginTop="100dp"
             android:scaleType="fitCenter"
+            android:layout_marginTop="150dp"
             android:background="@null"
             android:layout_height="90dp"
             android:onClick="placeBombIntent"
@@ -445,6 +438,18 @@
             android:layout_marginTop="100dp"
             android:scaleType="fitCenter"
             android:src="@drawable/confusion_disabled"
+            android:onClick="confusionIntent"
+            android:background="@null"
+            android:layout_weight="0.01"/>
+
+        <ImageButton
+            android:id="@+id/godmode_container"
+            android:layout_width="150dp"
+            android:layout_height="90dp"
+            android:scaleType="fitCenter"
+            android:layout_marginTop="100dp"
+            android:onClick="godmodeIntent"
+            android:src="@drawable/godmode_disabled"
             android:background="@null"
             android:layout_weight="0.01"/>
 

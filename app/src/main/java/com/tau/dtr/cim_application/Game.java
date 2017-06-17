@@ -18,6 +18,7 @@ import com.tau.dtr.cim_application.Utils.Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static com.tau.dtr.cim_application.MainActivity.sharedPreferences;
 import static com.tau.dtr.cim_application.MultiplayerManager.mGoogleApiClient;
@@ -25,6 +26,8 @@ import static com.tau.dtr.cim_application.MultiplayerManager.mMyId;
 import static com.tau.dtr.cim_application.MultiplayerManager.mMyRoom;
 import static com.tau.dtr.cim_application.Utils.Utils.getNthDigit;
 import static com.tau.dtr.cim_application.Utils.Utils.log;
+import static com.tau.dtr.cim_application.Utils.Utils.returnRandom;
+import static com.tau.dtr.cim_application.Utils.Utils.revertTile;
 
 /**
  * Created by dan on 10/06/2017.
@@ -37,12 +40,19 @@ public class Game extends Activity{
     static Boolean ShotsCaller;
     static Integer myTile;
     static Integer opponentTile;
+    static Integer turnNumber;
+    static Integer lastTurnPowerup;
     static Context mCtx;
     static Integer bombs;
     static Integer hp;
+    static Boolean powerup_confusion;
+    static Boolean powerup_godmode;
     static ArrayList<Integer> bombs_location;
+    static ArrayList<Integer> powerup_location;
     static boolean canPlaceBomb;
     static boolean bombIntent;
+    static boolean invulnerable;
+    static boolean confused;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +70,15 @@ public class Game extends Activity{
         opponentTile = 14;
         bombs=3;
         hp=3;
+        turnNumber = 1;
+        lastTurnPowerup = 1;
+        powerup_confusion = false;
+        powerup_godmode = false;
         bombs_location = new ArrayList<>();
+        powerup_location = new ArrayList<>();
         canPlaceBomb = true;
+        invulnerable = false;
+        confused = false;
 
         ImageView player2 = (ImageView) findViewById(R.id.square_14);
         ImageView player1 = (ImageView) findViewById(R.id.square_74);
@@ -96,25 +113,8 @@ public class Game extends Activity{
 
     public void Decipher(String message){
         try{
-
             int tile = Integer.parseInt(message);
-            int length = String.valueOf(tile).length();
-            if(length>2){
-                //powerup picked
-                int firstDigit = getNthDigit(tile, 1);
-                switch (firstDigit){
-                    case(1):
-                        break;
-                    case(2):
-                        break;
-                    case(3):
-                        break;
-                }
-            }else{
-                //just moved
-                MoveTileOpponent(tile);
-            }
-
+            MoveTileOpponent(tile);
             myTurn = true;
 
         }catch (NumberFormatException e){
@@ -123,10 +123,26 @@ public class Game extends Activity{
                 onWin();
                 return;
             }
+            if(message.equals("opponent_confusion")){
+                confused = true;
+                return;
+            }
             String[] sep = message.split(" ");
+            String tile = sep[1];
             if(sep[0].equals("bomb")){
-                String tile = sep[1];
                 placeBomb(Integer.parseInt(tile), true);
+            }
+            if(sep[0].equals("bomb_remove")){
+                bombs_location.remove(Integer.parseInt(tile));
+                return;
+            }
+            if(sep[0].equals("powerup")){
+                placePowerup(tile);
+                return;
+            }
+            if(sep[0].equals("powerup_remove")){
+                powerup_location.remove(Integer.parseInt(tile));
+                return;
             }
         }
     }
@@ -152,6 +168,7 @@ public class Game extends Activity{
             if(tile==myTile+1 || tile==myTile-1 || tile==myTile+10 || tile==myTile+11 || tile == myTile+9 || tile==myTile-10 || tile ==myTile-11 || tile == myTile-9){
                 MoveTileSelf(tile);
                 checkBombs(tile);
+                checkPowerups(tile);
             }
         }else{
             showToast("Wait for your turn imbecile");
@@ -160,25 +177,67 @@ public class Game extends Activity{
 
     public void checkBombs(Integer tile){
         if(bombs_location.contains(tile)){
+            if(invulnerable){
+                invulnerable = false;
+                return;
+            }
+            invulnerable = false;
             ImageView hpImg = (ImageView) findViewById(R.id.img_hp);
-            hpImg.setScaleType(ImageView.ScaleType.FIT_CENTER);
             Lejos.makeSound_Boom();
             switch (hp){
                 case(3):
                     hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_23));
-                    hpImg.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     break;
                 case(2):
                     hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_13));
-                    hpImg.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     break;
                 case(1):
                     hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_03));
-                    hpImg.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     break;
             }
             hp = hp-1;
             bombs_location.remove(tile);
+            MultiplayerManager.getInstance().SendMessage("bomb_remove " + revertTile(tile).toString());
+            if(hp==0){
+                onLose();
+            }
+            showTimedAlertDialog("PWNED!", "You just stepped on a mine", 3);
+        }
+    }
+
+    public void checkPowerups(Integer tile){
+        if(powerup_location.contains(tile)){
+            Lejos.makeSound_Powerup();
+            Integer randomPowerup = returnRandom(0,4);
+            switch (randomPowerup){
+                case(0):
+                    showTimedAlertDialog("Powerup Picked!", "+HEALTH", 3);
+                    if(hp<3){
+                        hp= hp+1;
+                    }
+                    break;
+                case(1):
+                    showTimedAlertDialog("Powerup Picked!", "+BOMBS", 3);
+                    if(bombs<3){
+                        bombs = bombs+1;
+                    }
+                    break;
+                case(2):
+                    showTimedAlertDialog("Powerup Picked!", "CONFUSION", 3);
+                    powerup_confusion = true;
+                    ImageView img_confusion = findImageButton("confusion_container");
+                    img_confusion.setImageDrawable(getResources().getDrawable(R.drawable.confusion));
+                    break;
+                case(3):
+                    showTimedAlertDialog("Powerup Picked!", "GOD MODE", 3);
+                    powerup_godmode = true;
+                    ImageView img_god = findImageButton("godmode_container");
+                    img_god.setImageDrawable(getResources().getDrawable(R.drawable.godmode));
+                    break;
+            }
+            hp = hp-1;
+            bombs_location.remove(tile);
+            MultiplayerManager.getInstance().SendMessage("powerup_remove " + tile.toString());
             if(hp==0){
                 onLose();
             }
@@ -190,15 +249,13 @@ public class Game extends Activity{
         MultiplayerManager.getInstance().SendMessage(position.toString());
         HandleLejos(myTile, position);
 
-        int resID = getApplicationContext().getResources().getIdentifier("square_"+position.toString(), "id", getPackageName());
-        int resID_old = getApplicationContext().getResources().getIdentifier("square_"+myTile.toString(), "id", getPackageName());
-        ImageView player1 = (ImageView) findViewById(resID);
-        ImageView player1_old = (ImageView) findViewById(resID_old);
-        player1.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        ImageView player1 = findImageButton("square_"+position.toString());
+        ImageView player1_old = findImageButton("square_"+myTile.toString());
         player1.setImageDrawable(getResources().getDrawable(R.drawable.tank_blue));
         player1_old.setImageDrawable(getResources().getDrawable(android.R.color.transparent));
         myTile = position;
         myTurn = false;
+        turnNumber = turnNumber + 1;
     }
 
     public void MoveTileOpponent(Integer position){
@@ -206,54 +263,83 @@ public class Game extends Activity{
         Integer position_inverted = revertTile(position);
         String position_inverted_str = String.valueOf(position_inverted);
 
-        int resID = mCtx.getResources().getIdentifier("square_"+position_inverted_str, "id", getPackageName());
-        int resID_old = mCtx.getApplicationContext().getResources().getIdentifier("square_"+opponentTile, "id", getPackageName());
-        ImageView player2 = (ImageView) findViewById(resID);
-        ImageView player2_old = (ImageView) findViewById(resID_old);
-        player2.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        ImageView player2 = findImageButton(position_inverted_str);
+        ImageView player2_old = findImageButton("square_"+opponentTile.toString());
         player2.setImageDrawable(getResources().getDrawable(R.drawable.tank_red));
         player2_old.setImageDrawable(getResources().getDrawable(android.R.color.transparent));
 
         opponentTile = position_inverted;
         myTurn = true;
         canPlaceBomb = true;
+        turnNumber = turnNumber + 1;
+
+        if(ShotsCaller){
+            placePowerup(null);
+        }
     }
 
-    @Override
-    public void onBackPressed() {
-        Intent i = new Intent(getBaseContext(), MainActivity.class);
-        startActivity(i);
+    public void placePowerup(String tileInput){
+        if(tileInput!=null){
+            ImageView tile_img = findImageButton("square_"+tileInput);
+            tile_img.setImageDrawable(getResources().getDrawable(R.drawable.box));
+            return;
+        }
+
+        if(turnNumber < lastTurnPowerup + 3){
+            return;
+        }
+
+        //random tile for powerup
+        Integer tile;
+        do{
+            Integer tile1 = returnRandom(1,8); // between 0 and 2
+            Integer tile2 = returnRandom(1,8); // between 0 and 2
+            tile = Integer.parseInt(tile1.toString() + tile2.toString());
+        }while (tile==myTile || tile==opponentTile || bombs_location.contains(tile));
+
+        ImageView tile_img = findImageButton("square_"+tile.toString());
+        tile_img.setImageDrawable(getResources().getDrawable(R.drawable.box));
+
+        MultiplayerManager.getInstance().SendMessage("powerup " + revertTile(tile));
+        lastTurnPowerup = turnNumber;
     }
 
-    public static Game getInstance(){
-        return mContext;
+    public void confusionIntent(View v){
+        if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
+            showToast("Please wait a second before issueing another command");
+            return;
+        }
+
+        if(!myTurn){
+            showToast("Wait for your turn imbecile");
+            return;
+        }
+        if(powerup_confusion){
+            showTimedAlertDialog("CONFUSION activated!", "Opponent will move randomley next round", 5);
+            powerup_confusion = false;
+            ImageView img = findImageButton("confusion_container");
+            img.setImageDrawable(getResources().getDrawable(R.drawable.confusion_disabled));
+            MultiplayerManager.getInstance().SendMessage("opponent_confusion");
+        }
     }
 
-    public void showTimedAlertDialog(String header, String msg, Integer seconds){
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle(header).setMessage(msg);
-        final AlertDialog alert = dialog.create();
-        alert.show();
+    public void godmodeIntent(View v){
 
-// Hide after some seconds
-        final Handler handler  = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (alert.isShowing()) {
-                    alert.dismiss();
-                }
-            }
-        };
-        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                handler.removeCallbacks(runnable);
-            }
-        });
-        handler.postDelayed(runnable, seconds*1000);
+        if(!myTurn){
+            showToast("Wait for your turn imbecile");
+            return;
+        }
+        if(powerup_godmode){
+            showTimedAlertDialog("GODMODE activated!", "Move freely without being hurt by mines", 5);
+            powerup_godmode = false;
+            ImageView img = findImageButton("godmode_container");
+            img.setImageDrawable(getResources().getDrawable(R.drawable.godmode_disabled));
+            invulnerable = true;
+        }
     }
 
     public void placeBombIntent(View v){
+
         if(!myTurn){
             showToast("Wait for your turn imbecile");
             return;
@@ -269,46 +355,38 @@ public class Game extends Activity{
         }
     }
 
+
+
     public void placeBomb(Integer tile, boolean enemy){
+
+        if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
+            showToast("Please wait a second before issueing another command");
+            return;
+        }
+
         bombs_location.add(tile);
         if(enemy){
             return;
         }
 
-        int resID = getApplicationContext().getResources().getIdentifier("square_"+tile.toString(), "id", getPackageName());
-        ImageView bombPlace = (ImageView) findViewById(resID);
+        ImageView bombPlace = findImageButton("square_"+tile.toString());
         bombPlace.setImageDrawable(getResources().getDrawable(R.drawable.bomb));
-        bombPlace.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        int resID_bomb = getApplicationContext().getResources().getIdentifier("bomb_container", "id", getPackageName());
-        ImageView bomb_container = (ImageView) findViewById(resID_bomb );
+        ImageView bomb_container = findImageButton("bomb_container");
         switch (bombs){
             case(3):
                 bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_2));
-                bomb_container.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 break;
             case(2):
                 bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_1));
-                bomb_container.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 break;
             case(1):
                 bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_0));
-                bomb_container.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 break;
         }
         bombs = bombs-1;
         bombIntent = false;
         canPlaceBomb = false;
         MultiplayerManager.getInstance().SendMessage("bomb " + revertTile(tile).toString());
-    }
-
-
-    public Integer revertTile(Integer tile){
-        int secondDigit = getNthDigit(tile,1);
-        int firstDigit = getNthDigit(tile, 2);
-        int firstDigitInverted = 8-firstDigit;
-        String combined = String.valueOf(firstDigitInverted) + String.valueOf(secondDigit);
-        return Integer.parseInt(combined);
-
     }
 
     public void HandleLejos(Integer old_position, Integer new_position){
@@ -409,6 +487,13 @@ public class Game extends Activity{
         handler.postDelayed(runnable, 10*1000);
     }
 
+    public ImageView findImageButton(String id){
+        int resID = getApplicationContext().getResources().getIdentifier(id, "id", getPackageName());
+        ImageView img = (ImageView) findViewById(resID);
+        img.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        return img;
+    }
+
     public void showToast(final String txt)
     {
         runOnUiThread(new Runnable() {
@@ -419,5 +504,39 @@ public class Game extends Activity{
         });
     }
 
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(getBaseContext(), MainActivity.class);
+        startActivity(i);
+    }
+
+    public void showTimedAlertDialog(String header, String msg, Integer seconds){
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle(header).setMessage(msg);
+        final AlertDialog alert = dialog.create();
+        alert.show();
+
+// Hide after some seconds
+        final Handler handler  = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (alert.isShowing()) {
+                    alert.dismiss();
+                }
+            }
+        };
+        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                handler.removeCallbacks(runnable);
+            }
+        });
+        handler.postDelayed(runnable, seconds*1000);
+    }
+
+    public static Game getInstance(){
+        return mContext;
+    }
 
 }
