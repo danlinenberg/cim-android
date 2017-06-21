@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.MutableContextWrapper;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,6 +44,7 @@ public class Game extends Activity{
     static Integer opponentTile;
     static Integer turnNumber;
     static Integer lastTurnPowerup;
+    static int numpressed;
     static Context mCtx;
     static Integer bombs;
     static Integer hp;
@@ -117,7 +119,6 @@ public class Game extends Activity{
         try{
             int tile = Integer.parseInt(message);
             MoveTileOpponent(tile);
-            myTurn = true;
 
         }catch (NumberFormatException e){
             // bomb
@@ -150,6 +151,12 @@ public class Game extends Activity{
     }
 
     public void getTilePressed(View v){
+        numpressed = numpressed + 1;
+        if(numpressed>4){
+            myTurn = true;
+            numpressed = 0;
+            showToast("Override: Your turn!");
+        }
         if(myTurn || is_debug){
             if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
                 showToast("Please wait a second before issueing another command");
@@ -161,7 +168,7 @@ public class Game extends Activity{
             int tile = Integer.parseInt(resource_str);
 
             if(bombIntent){
-                if(tile!=myTile && tile!=opponentTile && !bombs_location.contains(tile)){
+                if(tile!=myTile && tile!=opponentTile && !bombs_location.contains(tile) && !powerup_location.contains(tile)){
                     canPlaceBomb = false;
                     placeBomb(tile, false);
                     return;
@@ -381,7 +388,6 @@ public class Game extends Activity{
 
 
     public void placeBomb(Integer tile, boolean enemy){
-
         if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
             showToast("Please wait a second before issueing another command");
             return;
@@ -416,16 +422,16 @@ public class Game extends Activity{
             case(10):
                 Lejos.Back();
                 break;
-            case(11):
+            case(-9):
                 Lejos.ForwardRight();
                 break;
             case(9):
                 Lejos.BackLeft();
                 break;
-            case(-9):
+            case(-11):
                 Lejos.ForwardLeft();
                 break;
-            case(-11):
+            case(11):
                 Lejos.BackRight();
                 break;
         }
@@ -434,8 +440,8 @@ public class Game extends Activity{
 
     public void onLose(){
 
-        Lejos.Win();
 
+        MultiplayerManager.getInstance().SendMessage("win");
         final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("YOU LOSE").setMessage("You're not very good at this, are you?");
         final AlertDialog alert = dialog.create();
         alert.show();
@@ -462,6 +468,8 @@ public class Game extends Activity{
     }
 
     public void onWin(){
+
+        Lejos.Win();
 
         final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("YOU WIN!!!").setMessage("You're the best, around! nothing's ever gonna keep you down");
         final AlertDialog alert = dialog.create();
@@ -492,12 +500,15 @@ public class Game extends Activity{
         ImageView hpImg = (ImageView) findViewById(R.id.img_hp);
         switch (hp){
             case(3):
-                hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_23));
+                hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_33));
                 break;
             case(2):
-                hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_13));
+                hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_23));
                 break;
             case(1):
+                hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_13));
+                break;
+            case(0):
                 hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_03));
                 break;
         }
@@ -507,12 +518,15 @@ public class Game extends Activity{
         ImageView bomb_container = findImageButton("bomb_container");
         switch (bombs){
             case(3):
-                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_2));
+                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_3));
                 break;
             case(2):
-                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_1));
+                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_2));
                 break;
             case(1):
+                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_1));
+                break;
+            case(0):
                 bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_0));
                 break;
         }
