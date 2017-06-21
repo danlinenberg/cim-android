@@ -207,11 +207,54 @@ public class Lejos {
     }
 
     public static void makeSound_Boom(){
-
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothController.getInstance().SendMessage("o");
+            }
+        }, TIME_STRAIGHT*2+TIME_SIDE*2);
     }
 
-    public static void makeSound_Powerup(){
 
+    public static void makeSound_Powerup_hp(){
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothController.getInstance().SendMessage("1");
+            }
+        }, TIME_STRAIGHT*2+TIME_SIDE*2);
+    }
+    public static void makeSound_Powerup_bomb(){
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothController.getInstance().SendMessage("2");
+            }
+        }, TIME_STRAIGHT*2+TIME_SIDE*2);
+    }
+    public static void makeSound_Powerup_godmode(){
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothController.getInstance().SendMessage("3");
+            }
+        }, TIME_STRAIGHT*2+TIME_SIDE*2);
+    }
+    public static void makeSound_Powerup_confusion(){
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothController.getInstance().SendMessage("4");
+            }
+        }, TIME_STRAIGHT*2+TIME_SIDE*2);
+    }
+    public static void Win(){
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothController.getInstance().SendMessage("w");
+            }
+        }, TIME_STRAIGHT*2+TIME_SIDE*2);
     }
 
 

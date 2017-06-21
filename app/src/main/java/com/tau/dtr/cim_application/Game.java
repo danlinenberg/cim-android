@@ -167,10 +167,12 @@ public class Game extends Activity{
                     return;
                 }
             }
-            if(tile==myTile+1 || tile==myTile-1 || tile==myTile+10 || tile==myTile+11 || tile == myTile+9 || tile==myTile-10 || tile ==myTile-11 || tile == myTile-9){
+            if((tile==myTile+1 || tile==myTile-1 || tile==myTile+10 || tile==myTile+11 || tile == myTile+9 || tile==myTile-10 || tile ==myTile-11 || tile == myTile-9) && myTile != opponentTile){
                 MoveTileSelf(tile);
                 checkBombs(tile);
                 checkPowerups(tile);
+            }else{
+                showToast("Can't move there imbecile");
             }
         }else{
             showToast("Wait for your turn imbecile");
@@ -184,20 +186,9 @@ public class Game extends Activity{
                 return;
             }
             invulnerable = false;
-            ImageView hpImg = (ImageView) findViewById(R.id.img_hp);
             Lejos.makeSound_Boom();
-            switch (hp){
-                case(3):
-                    hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_23));
-                    break;
-                case(2):
-                    hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_13));
-                    break;
-                case(1):
-                    hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_03));
-                    break;
-            }
             hp = hp-1;
+            DrawHP();
             bombs_location.remove(tile);
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -215,36 +206,40 @@ public class Game extends Activity{
 
     public void checkPowerups(final Integer tile){
         if(powerup_location.contains(tile)){
-            Lejos.makeSound_Powerup();
             Integer randomPowerup = returnRandom(0,4);
             switch (randomPowerup){
                 case(0):
                     showTimedAlertDialog("Powerup Picked!", "+HEALTH", 3);
                     if(hp<3){
-                        hp= hp+1;
+                        hp = hp +1;
+                        DrawHP();
                     }
+                    Lejos.makeSound_Powerup_hp();
                     break;
                 case(1):
                     showTimedAlertDialog("Powerup Picked!", "+BOMBS", 3);
                     if(bombs<3){
                         bombs = bombs+1;
+                        DrawBombs();
                     }
+                    Lejos.makeSound_Powerup_bomb();
                     break;
                 case(2):
                     showTimedAlertDialog("Powerup Picked!", "CONFUSION", 3);
                     powerup_confusion = true;
                     ImageView img_confusion = findImageButton("confusion_container");
                     img_confusion.setImageDrawable(getResources().getDrawable(R.drawable.confusion));
+                    Lejos.makeSound_Powerup_confusion();
                     break;
                 case(3):
                     showTimedAlertDialog("Powerup Picked!", "GOD MODE", 3);
                     powerup_godmode = true;
                     ImageView img_god = findImageButton("godmode_container");
                     img_god.setImageDrawable(getResources().getDrawable(R.drawable.godmode));
+                    Lejos.makeSound_Powerup_godmode();
                     break;
             }
-            hp = hp-1;
-            bombs_location.remove(tile);
+            powerup_location.remove(tile);
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -252,14 +247,24 @@ public class Game extends Activity{
                     MultiplayerManager.getInstance().SendMessage("powerup_remove " + tile.toString());
                 }
             }, 1000);
-            if(hp==0){
-                onLose();
-            }
-            showTimedAlertDialog("PWNED!", "You just stepped on a mine", 3);
         }
     }
 
     public void MoveTileSelf(Integer position){
+
+        if(confused){
+            //random tile for confusion
+            Integer tile;
+            do{
+                Integer tile1 = returnRandom(getNthDigit(position,1)-1,getNthDigit(position,1)+2);
+                Integer tile2 = returnRandom(getNthDigit(position,2)-1,getNthDigit(position,2)+2); // between 0 and 2
+                tile = Integer.parseInt(tile1.toString() + tile2.toString());
+            }while (tile==myTile || tile==opponentTile || getNthDigit(tile,1)<1 || getNthDigit(tile,1)>7 || getNthDigit(tile,2)<1 || getNthDigit(tile,2)>7);
+            position = tile;
+            showTimedAlertDialog("You are confused!", "moving at a random direction", 5);
+            confused = false;
+        }
+
         MultiplayerManager.getInstance().SendMessage(position.toString());
 
         if(!is_debug){
@@ -302,7 +307,7 @@ public class Game extends Activity{
             return;
         }
 
-        if(turnNumber < lastTurnPowerup + 3){
+        if(turnNumber < lastTurnPowerup + 3 || powerup_location.size()>3){
             return;
         }
 
@@ -319,6 +324,7 @@ public class Game extends Activity{
 
         MultiplayerManager.getInstance().SendMessage("powerup " + revertTile(tile));
         lastTurnPowerup = turnNumber;
+        powerup_location.add(tile);
     }
 
     public void confusionIntent(View v){
@@ -341,7 +347,6 @@ public class Game extends Activity{
     }
 
     public void godmodeIntent(View v){
-
         if(!myTurn){
             showToast("Wait for your turn imbecile");
             return;
@@ -388,19 +393,8 @@ public class Game extends Activity{
 
         ImageView bombPlace = findImageButton("square_"+tile.toString());
         bombPlace.setImageDrawable(getResources().getDrawable(R.drawable.bomb));
-        ImageView bomb_container = findImageButton("bomb_container");
-        switch (bombs){
-            case(3):
-                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_2));
-                break;
-            case(2):
-                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_1));
-                break;
-            case(1):
-                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_0));
-                break;
-        }
         bombs = bombs-1;
+        DrawBombs();
         bombIntent = false;
         canPlaceBomb = false;
         MultiplayerManager.getInstance().SendMessage("bomb " + revertTile(tile).toString());
@@ -408,41 +402,30 @@ public class Game extends Activity{
 
     public void HandleLejos(Integer old_position, Integer new_position){
         int compare = new_position-old_position;
-//        String direction = "f"; //default go forward
         switch (compare){
             case(1):
-                //Right
                 Lejos.Right();
-//                direction = "r"; //114
                 break;
             case(-1):
                 Lejos.Left();
-//                direction = "l"; //108
                 break;
             case(-10):
                 Lejos.Forward();
-//                direction = "f"; //102
                 break;
             case(10):
                 Lejos.Back();
-//                direction = "b"; //98
                 break;
             case(11):
                 Lejos.ForwardRight();
-//                direction = "fr"; //102 114
                 break;
             case(9):
                 Lejos.BackLeft();
-//                direction = "bl"; //98 108
                 break;
             case(-9):
                 Lejos.ForwardLeft();
-//                direction = "fl"; //102 108
                 break;
             case(-11):
                 Lejos.BackRight();
-//                direction = "br"; //102
-
                 break;
         }
     }
@@ -450,7 +433,7 @@ public class Game extends Activity{
 
     public void onLose(){
 
-        MultiplayerManager.getInstance().SendMessage("win");
+        Lejos.Win();
 
         final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("YOU LOSE").setMessage("You're not very good at this, are you?");
         final AlertDialog alert = dialog.create();
@@ -502,6 +485,36 @@ public class Game extends Activity{
             }
         });
         handler.postDelayed(runnable, 10*1000);
+    }
+
+    public void DrawHP(){
+        ImageView hpImg = (ImageView) findViewById(R.id.img_hp);
+        switch (hp){
+            case(3):
+                hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_23));
+                break;
+            case(2):
+                hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_13));
+                break;
+            case(1):
+                hpImg.setImageDrawable(getResources().getDrawable(R.drawable.hp_03));
+                break;
+        }
+    }
+
+    public void DrawBombs(){
+        ImageView bomb_container = findImageButton("bomb_container");
+        switch (bombs){
+            case(3):
+                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_2));
+                break;
+            case(2):
+                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_1));
+                break;
+            case(1):
+                bomb_container.setImageDrawable(getResources().getDrawable(R.drawable.bomb_0));
+                break;
+        }
     }
 
     public ImageView findImageButton(String id){

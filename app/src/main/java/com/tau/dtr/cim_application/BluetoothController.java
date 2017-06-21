@@ -2,9 +2,6 @@ package com.tau.dtr.cim_application;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 import me.aflak.bluetooth.Bluetooth;

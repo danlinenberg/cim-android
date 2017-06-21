@@ -1,19 +1,13 @@
 package com.tau.dtr.cim_application.Utils;
 
-import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
-import android.os.Debug;
 import android.util.Log;
-import android.widget.Toast;
-
 import java.util.Random;
 
 /**
  * Created by dan on 07/06/2017.
  */
 
-public class Utils extends Activity{
+public class Utils {
 
     public static String LOG_TAG = "CIM_DTR";
 
@@ -21,13 +15,8 @@ public class Utils extends Activity{
         Log.d(LOG_TAG, txt);
     }
 
-
     public static Boolean is_debug = false;
 
-//    public static int firstDigit(int n) {
-//        while (n < -9 || 9 < n) n /= 10;
-//        return Math.abs(n);
-//    }
     public static int getNthDigit(int a, int b) {
         return (int) ((a / Math.pow(10, b - 1)) % 10);
     }
@@ -41,8 +30,9 @@ public class Utils extends Activity{
         int secondDigit = getNthDigit(tile,1);
         int firstDigit = getNthDigit(tile, 2);
         int firstDigitInverted = 8-firstDigit;
-        String combined = String.valueOf(firstDigitInverted) + String.valueOf(secondDigit);
+        int secondDigitInverted = 8-secondDigit;
+        String combined = String.valueOf(firstDigitInverted) + String.valueOf(secondDigitInverted);
         return Integer.parseInt(combined);
-
     }
+
 }
