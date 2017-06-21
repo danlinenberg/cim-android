@@ -182,6 +182,7 @@ public class Game extends Activity{
     public void checkBombs(final Integer tile){
         if(bombs_location.contains(tile)){
             if(invulnerable){
+                showTimedAlertDialog("PHEW!", "Your GODMODE saved your life", 5);
                 invulnerable = false;
                 return;
             }
@@ -541,12 +542,12 @@ public class Game extends Activity{
         startActivity(i);
     }
 
-    public void showTimedAlertDialog(String header, String msg, Integer seconds){
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle(header).setMessage(msg);
+    public void showTimedAlertDialog(final String header, final String msg, final Integer seconds){
+
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(Game.this).setTitle(header).setMessage(msg);
         final AlertDialog alert = dialog.create();
         alert.show();
 
-// Hide after some seconds
         final Handler handler  = new Handler();
         final Runnable runnable = new Runnable() {
             @Override
@@ -563,6 +564,7 @@ public class Game extends Activity{
             }
         });
         handler.postDelayed(runnable, seconds*1000);
+
     }
 
     public static Game getInstance(){
