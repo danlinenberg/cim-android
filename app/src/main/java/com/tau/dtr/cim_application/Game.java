@@ -154,10 +154,10 @@ public class Game extends Activity{
         numpressed = numpressed + 1;
         if(numpressed>4){
             myTurn = true;
-            numpressed = 0;
             showToast("Override: Your turn!");
         }
         if(myTurn || is_debug){
+            numpressed = 0;
             if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
                 showToast("Please wait a second before issueing another command");
                 return;
@@ -172,9 +172,11 @@ public class Game extends Activity{
                     canPlaceBomb = false;
                     placeBomb(tile, false);
                     return;
+                }else{
+                    showToast("Cant place there");
                 }
             }
-            if((tile==myTile+1 || tile==myTile-1 || tile==myTile+10 || tile==myTile+11 || tile == myTile+9 || tile==myTile-10 || tile ==myTile-11 || tile == myTile-9) && myTile != opponentTile){
+            if((tile==myTile+1 || tile==myTile-1 || tile==myTile+10 || tile==myTile+11 || tile == myTile+9 || tile==myTile-10 || tile ==myTile-11 || tile == myTile-9) && tile != opponentTile){
                 MoveTileSelf(tile);
                 checkBombs(tile);
                 checkPowerups(tile);
