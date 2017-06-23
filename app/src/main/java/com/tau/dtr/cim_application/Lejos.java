@@ -7,6 +7,9 @@ import android.os.Handler;
  */
 
 
+/**
+ * A class that sends bluetooth datastreams to the brick
+ */
 public class Lejos {
 
     static final long TIME_STRAIGHT = 4000;

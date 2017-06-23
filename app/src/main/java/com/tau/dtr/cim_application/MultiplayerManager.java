@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
-
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -25,15 +24,12 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.example.games.basegameutils.BaseGameUtils;
-
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-
 import static com.tau.dtr.cim_application.Utils.Utils.log;
 
 /**
@@ -58,6 +54,10 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
     static Long timeSent;
     static final int TIME_BETWEEN_MESSAGES = 1000;
 
+    /**
+     * intercept a message from the opponent, and sends to to decipher method in Game.java
+     * @param realTimeMessage
+     */
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
         try{
@@ -70,6 +70,10 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         }
     }
 
+    /**
+     * Sends a message to the opponent (converts it into a byte array)
+     * @param msg
+     */
     public void SendMessage(String msg) {
         timeSent = System.currentTimeMillis();
         try{
@@ -80,6 +84,9 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         }
     }
 
+    /**
+     * starts the multiplayer activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,6 +134,11 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         log("Need to login");
     }
 
+    /**
+     * check number of players in the room
+     * @param room
+     * @return
+     */
     boolean shouldStartGame(Room room) {
         int connectedPlayers = 0;
         for (Participant p : room.getParticipants()) {
@@ -135,6 +147,9 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         return connectedPlayers >= MIN_PLAYERS;
     }
 
+    /**
+     * Open a game room
+     */
     public void StartGame(){
         Bundle am = RoomConfig.createAutoMatchCriteria(1, 1, 0);
 
@@ -148,10 +163,6 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
         // prevent screen from sleeping during handshake
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        /**
-         * Go to game screen
-         */
     }
 
     public void OnButtonLogin(View v){
@@ -169,7 +180,7 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         /**
-         * Sign in
+         * Sign in to google
          */
         if (requestCode == RC_SIGN_IN) {
             mSignInClicked = false;
@@ -192,12 +203,6 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
                 log("Ready to start game");
             }
             else if (resultCode == Activity.RESULT_CANCELED) {
-                // Waiting room was dismissed with the back button. The meaning of this
-                // action is up to the game. You may choose to leave the room and cancel the
-                // match, or do something else like minimize the waiting room and
-                // continue to connect in the background.
-
-                // in this example, we take the simple approach and just leave the room:
                 Games.RealTimeMultiplayer.leave(mGoogleApiClient, null, mMyRoom.getRoomId());
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
@@ -209,6 +214,9 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         }
     }
 
+    /**
+     * When starting the activity - connect to our api client
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -226,6 +234,11 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         log("Res: " + result);
     }
 
+
+    /**
+     * Room configurations (callbacks)
+     * @return
+     */
     private RoomConfig.Builder makeBasicRoomConfigBuilder() {
         return RoomConfig.builder(this)
                 .setMessageReceivedListener(this)
@@ -304,6 +317,11 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
                 });
     }
 
+    /**
+     * Get paramters from room once it's created, and go into the waiting room
+     * @param i
+     * @param room
+     */
     @Override
     public void onRoomCreated(int i, Room room) {
 
@@ -325,6 +343,11 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
     public void onLeftRoom(int i, String s) {
     }
 
+    /**
+     * joined room
+     * @param i
+     * @param room
+     */
     @Override
     public void onJoinedRoom(int i, Room room) {
         String roomId = room.getRoomId();
@@ -377,6 +400,10 @@ public class MultiplayerManager extends FragmentActivity implements ResultCallba
         return firstId;
     }
 
+    /**
+     * limits the messages a player can send. since we're sending unreliable messages, we need to control them
+     * @return
+     */
     public boolean enoughTimeBetweenCommands(){
         if(timeSent!=null){
             if(System.currentTimeMillis()<=timeSent+TIME_BETWEEN_MESSAGES) {

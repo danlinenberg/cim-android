@@ -17,15 +17,35 @@ public class Utils {
 
     public static Boolean is_debug = false;
 
+
+    /**
+     * get digit N from tile
+     * @param a
+     * @param b
+     * @return
+     */
     public static int getNthDigit(int a, int b) {
         return (int) ((a / Math.pow(10, b - 1)) % 10);
     }
 
+
+    /**
+     * random integer
+     * @param min
+     * @param max
+     * @return
+     */
     public static Integer returnRandom(int min, int max){
         Random r = new Random();
         return r.nextInt(max - min + 1) + min;
     }
 
+
+    /**
+     * revert the tile of the opponent (so the dispaly would fit the player's perspective
+     * @param tile
+     * @return
+     */
     public static Integer revertTile(Integer tile){
         int secondDigit = getNthDigit(tile,1);
         int firstDigit = getNthDigit(tile, 2);

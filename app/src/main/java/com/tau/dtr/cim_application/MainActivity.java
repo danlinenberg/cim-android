@@ -15,7 +15,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.regions.Region;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.tau.dtr.cim_application.Utils.Utils;
-
 import static com.tau.dtr.cim_application.Utils.Utils.is_debug;
 import static com.tau.dtr.cim_application.Utils.Utils.log;
 
@@ -29,7 +28,9 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
     public EditText editText;
     static SharedPreferences sharedPreferences;
 
-
+    /**
+     * Starts the main activity of the app
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +44,9 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
         }
 
         /**
-         * Initiate bluetooth service (this happens before actively searching for the brick
+         * Initiate bluetooth service (this happens before actively searching for the brick)
          */
         BluetoothController.getInstance().instantiateBluetooth(this);
-//        startAWS();
     }
 
 
@@ -86,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
         mapper = new DynamoDBMapper(ddbClient);
     }
 
+    /***
+     * handle button press - get the brick name from the user, and start looking for bluetooth devices
+     * @param is_debug - allows for the game to run without using bricks
+     */
     public void onButtonPressBluetooth(View v){
         String brick = editText.getText().toString();
         saveBrickName(brick);
@@ -95,9 +99,13 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
             startActivity(i);
             return;
         }
+
         BluetoothController.getInstance().StartBluetoothQuery(brick, this);
     }
 
+    /**
+     * Sets debug mode (game without bricks)
+     */
     public void setDebug(View v){
         if(is_debug){
             is_debug = false;
@@ -108,6 +116,28 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
         }
     }
 
+    /**
+     * @param brick
+     * saves the brick name to our persistant data
+     */
+    public void saveBrickName(String brick) {
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("brick", brick);
+        editor.commit();
+    }
+
+    /**
+     * @return instance of the class
+     */
+    public static MainActivity getInstance(){
+        return mContext;
+    }
+
+
+    /**
+     * shows a UI toast
+     * @param txt
+     */
     public void showToast(final String txt)
     {
         runOnUiThread(new Runnable() {
@@ -116,16 +146,6 @@ public class MainActivity extends AppCompatActivity implements MainInterface{
                 Toast.makeText(getApplicationContext(),txt, Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    public void saveBrickName(String brick) {
-        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("brick", brick);
-        editor.commit();
-    }
-
-    public static MainActivity getInstance(){
-        return mContext;
     }
 
 }

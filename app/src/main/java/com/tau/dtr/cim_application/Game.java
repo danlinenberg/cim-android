@@ -5,26 +5,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.MutableContextWrapper;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.widget.AppCompatImageButton;
-import android.support.v7.widget.AppCompatImageView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.tau.dtr.cim_application.Utils.Utils;
-
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Random;
-
 import static com.tau.dtr.cim_application.MainActivity.sharedPreferences;
-import static com.tau.dtr.cim_application.MultiplayerManager.mGoogleApiClient;
 import static com.tau.dtr.cim_application.MultiplayerManager.mMyId;
-import static com.tau.dtr.cim_application.MultiplayerManager.mMyRoom;
 import static com.tau.dtr.cim_application.Utils.Utils.getNthDigit;
 import static com.tau.dtr.cim_application.Utils.Utils.is_debug;
 import static com.tau.dtr.cim_application.Utils.Utils.log;
@@ -58,6 +46,9 @@ public class Game extends Activity{
     static boolean confused;
 
 
+    /**
+     * start the game activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +58,10 @@ public class Game extends Activity{
         StartGame();
     }
 
+
+    /**
+     * define all the game variables and assets
+     */
     public void StartGame(){
         log("Game started");
 
@@ -90,8 +85,11 @@ public class Game extends Activity{
         player2.setScaleType(ImageView.ScaleType.FIT_CENTER);
         player1.setImageDrawable(getResources().getDrawable(R.drawable.tank_blue));
         player2.setImageDrawable(getResources().getDrawable(R.drawable.tank_red));
+        String playerStarterId = getIntent().getStringExtra(getResources().getString(R.string.game_player_starter));
 
-//        String playerStarterId = getIntent().getStringExtra(getResources().getString(R.string.game_player_starter));
+        /**
+         * decides who gets to start according to the algorithm in MultiplayerManager.java
+         */
 //        if(playerStarterId.equals(mMyId)){
 //            myTurn = true;
 //            showTimedAlertDialog("Your turn!", "Click on spot you want to move your brick to", 5);
@@ -99,6 +97,10 @@ public class Game extends Activity{
 //            myTurn = false;
 //            showTimedAlertDialog("Your opponent's move", "Wait for your opponent to make a move", 5);
 //        }
+
+        /**
+         * fallback incase the previous method doesnt work
+         */
         try{
             if(sharedPreferences.getString("brick", null).contains("Arafat")){
                 myTurn = true;
@@ -115,6 +117,10 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * deciphers a message sent from the opponent
+     * @param message
+     */
     public void Decipher(String message){
         try{
             int tile = Integer.parseInt(message);
@@ -150,6 +156,9 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * detect a board tile press and proceed accordingly
+     */
     public void getTilePressed(View v){
         numpressed = numpressed + 1;
         if(numpressed>4){
@@ -176,6 +185,9 @@ public class Game extends Activity{
                     showToast("Cant place there");
                 }
             }
+            /**
+             * check if tile is valid
+             */
             if((tile==myTile+1 || tile==myTile-1 || tile==myTile+10 || tile==myTile+11 || tile == myTile+9 || tile==myTile-10 || tile ==myTile-11 || tile == myTile-9) && tile != opponentTile){
                 MoveTileSelf(tile);
                 checkBombs(tile);
@@ -188,6 +200,10 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * check if we stepped on a bomb
+     * @param tile
+     */
     public void checkBombs(final Integer tile){
         if(bombs_location.contains(tile)){
             if(invulnerable){
@@ -214,6 +230,10 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * checked if we stepped on a powerup
+     * @param tile
+     */
     public void checkPowerups(final Integer tile){
         if(powerup_location.contains(tile)){
             Integer randomPowerup = returnRandom(0,4);
@@ -260,8 +280,14 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * move player to his chosen tile
+     * @param position
+     */
     public void MoveTileSelf(Integer position){
-
+        /**
+         * if opponent activated confusion - move to a random tile
+         */
         if(confused){
             //random tile for confusion
             Integer tile;
@@ -275,6 +301,9 @@ public class Game extends Activity{
             confused = false;
         }
 
+        /**
+         * send message to opponent
+         */
         MultiplayerManager.getInstance().SendMessage(position.toString());
 
         if(!is_debug){
@@ -290,8 +319,11 @@ public class Game extends Activity{
         turnNumber = turnNumber + 1;
     }
 
+    /**
+     * move opponent on board after receiving a message from him
+     * @param position
+     */
     public void MoveTileOpponent(Integer position){
-
         Integer position_inverted = revertTile(position);
         String position_inverted_str = String.valueOf(position_inverted);
 
@@ -310,6 +342,10 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * place a powerup
+     * @param tileInput
+     */
     public void placePowerup(String tileInput){
         if(tileInput!=null){
             ImageView tile_img = findImageButton("square_"+tileInput);
@@ -337,6 +373,10 @@ public class Game extends Activity{
         powerup_location.add(tile);
     }
 
+    /**
+     * player wants to activate confusion powerup
+     * @param v
+     */
     public void confusionIntent(View v){
         if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
             showToast("Please wait a second before issueing another command");
@@ -356,6 +396,10 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * player wants to activate godmode powerup
+     * @param v
+     */
     public void godmodeIntent(View v){
         if(!myTurn){
             showToast("Wait for your turn imbecile");
@@ -370,6 +414,10 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * player wants to place a bomb
+     * @param v
+     */
     public void placeBombIntent(View v){
 
         if(!myTurn){
@@ -388,7 +436,11 @@ public class Game extends Activity{
     }
 
 
-
+    /**
+     * place a bomb
+     * @param tile
+     * @param enemy
+     */
     public void placeBomb(Integer tile, boolean enemy){
         if(!MultiplayerManager.getInstance().enoughTimeBetweenCommands()){
             showToast("Please wait a second before issueing another command");
@@ -409,6 +461,11 @@ public class Game extends Activity{
         MultiplayerManager.getInstance().SendMessage("bomb " + revertTile(tile).toString());
     }
 
+    /**
+     * figure out where to move the brick according to the distance between the two tiles, and send the message to Lejos.java
+     * @param old_position
+     * @param new_position
+     */
     public void HandleLejos(Integer old_position, Integer new_position){
         int compare = new_position-old_position;
         switch (compare){
@@ -439,10 +496,14 @@ public class Game extends Activity{
         }
     }
 
-
+    /**
+     * when hp==0
+     */
     public void onLose(){
 
-
+        /**
+         * notify the opponent that he won
+         */
         MultiplayerManager.getInstance().SendMessage("win");
         final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("YOU LOSE").setMessage("You're not very good at this, are you?");
         final AlertDialog alert = dialog.create();
@@ -469,8 +530,14 @@ public class Game extends Activity{
         handler.postDelayed(runnable, 10*1000);
     }
 
+    /**
+     * YEAAAAA
+     */
     public void onWin(){
 
+        /**
+         * play 'we are the champions' on the brick
+         */
         Lejos.Win();
 
         final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("YOU WIN!!!").setMessage("You're the best, around! nothing's ever gonna keep you down");
@@ -498,6 +565,9 @@ public class Game extends Activity{
         handler.postDelayed(runnable, 10*1000);
     }
 
+    /**
+     * UI code
+     */
     public void DrawHP(){
         ImageView hpImg = (ImageView) findViewById(R.id.img_hp);
         switch (hp){
@@ -516,6 +586,9 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * UI code
+     */
     public void DrawBombs(){
         ImageView bomb_container = findImageButton("bomb_container");
         switch (bombs){
@@ -534,6 +607,11 @@ public class Game extends Activity{
         }
     }
 
+    /**
+     * UI Code
+     * @param id
+     * @return
+     */
     public ImageView findImageButton(String id){
         int resID = getApplicationContext().getResources().getIdentifier(id, "id", getPackageName());
         ImageView img = (ImageView) findViewById(resID);

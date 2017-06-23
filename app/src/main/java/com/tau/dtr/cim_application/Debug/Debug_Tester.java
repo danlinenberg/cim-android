@@ -37,23 +37,23 @@ public class Debug_Tester extends Activity implements MainInterface{
     }
 
     public void onForward(View v){
-        Lejos.Forward();
+        Lejos.Win();
     }
 
     public void onBack(View v){
-        Lejos.Back();
+        Lejos.makeSound_Powerup_bomb();
     }
 
     public void onRight(View v){
-        Lejos.Right();
+        Lejos.makeSound_Powerup_godmode();
     }
 
     public void onLeft(View v){
-        Lejos.Left();
+        Lejos.makeSound_Powerup_confusion();
     }
 
     public void onConnect(View v){
-        BluetoothController.getInstance().StartBluetoothQuery("Ohazan4", this);
+        BluetoothController.getInstance().StartBluetoothQuery("Arafat1", this);
     }
 
     public void onBluetoothComplete(String device_name) {
