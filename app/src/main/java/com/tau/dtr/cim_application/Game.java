@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 import java.util.ArrayList;
+
+import static com.tau.dtr.cim_application.Lejos.TIME_SIDE;
+import static com.tau.dtr.cim_application.Lejos.TIME_STRAIGHT;
 import static com.tau.dtr.cim_application.MainActivity.sharedPreferences;
 import static com.tau.dtr.cim_application.MultiplayerManager.mMyId;
 import static com.tau.dtr.cim_application.Utils.Utils.getNthDigit;
@@ -190,7 +193,6 @@ public class Game extends Activity{
              */
             if((tile==myTile+1 || tile==myTile-1 || tile==myTile+10 || tile==myTile+11 || tile == myTile+9 || tile==myTile-10 || tile ==myTile-11 || tile == myTile-9) && tile != opponentTile){
                 MoveTileSelf(tile);
-                checkBombs(tile);
                 checkPowerups(tile);
             }else{
                 showToast("Can't move there imbecile");
@@ -471,29 +473,38 @@ public class Game extends Activity{
         switch (compare){
             case(1):
                 Lejos.Right();
+                Lejos.TimeToBombSound = TIME_STRAIGHT+TIME_SIDE*2;
                 break;
             case(-1):
                 Lejos.Left();
+                Lejos.TimeToBombSound = TIME_STRAIGHT+TIME_SIDE*2;
                 break;
             case(-10):
                 Lejos.Forward();
+                Lejos.TimeToBombSound = TIME_STRAIGHT;
                 break;
             case(10):
                 Lejos.Back();
+                Lejos.TimeToBombSound = TIME_STRAIGHT;
                 break;
             case(-9):
                 Lejos.ForwardRight();
+                Lejos.TimeToBombSound = TIME_STRAIGHT*2+TIME_SIDE*2;
                 break;
             case(9):
                 Lejos.BackLeft();
+                Lejos.TimeToBombSound = TIME_STRAIGHT*2+TIME_SIDE*2;
                 break;
             case(-11):
                 Lejos.ForwardLeft();
+                Lejos.TimeToBombSound = TIME_STRAIGHT*2+TIME_SIDE*2;
                 break;
             case(11):
                 Lejos.BackRight();
+                Lejos.TimeToBombSound = TIME_STRAIGHT*2+TIME_SIDE*2;
                 break;
         }
+        checkBombs(new_position);
     }
 
     /**

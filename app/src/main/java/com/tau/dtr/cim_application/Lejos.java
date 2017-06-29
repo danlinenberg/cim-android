@@ -14,6 +14,7 @@ public class Lejos {
 
     static final long TIME_STRAIGHT = 4000;
     static final long TIME_SIDE = 1650;
+    static long TimeToBombSound = 0;
     static final Handler handler = new Handler();
 
     public static void Forward(){
@@ -215,7 +216,7 @@ public class Lejos {
             public void run() {
                 BluetoothController.getInstance().SendMessage("o");
             }
-        }, TIME_STRAIGHT*2+TIME_SIDE*2);
+        }, TimeToBombSound+600);
     }
 
 
